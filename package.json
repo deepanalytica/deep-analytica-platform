@@ -15,7 +15,8 @@
     "next": "14.2.35",
     "next-sanity": "^9.12.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "sanity": "^3.99.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
