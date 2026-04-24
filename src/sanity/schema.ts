@@ -1,3 +1,5 @@
+import type { Rule } from 'sanity';
+
 export const post = {
   name: 'post',
   title: 'Artículo de Blog',
@@ -7,14 +9,14 @@ export const post = {
       name: 'title',
       title: 'Título',
       type: 'string',
-      validation: (Rule: any) => Rule.required(),
+      validation: (rule: Rule) => rule.required(),
     },
     {
       name: 'slug',
       title: 'Slug (URL)',
       type: 'slug',
       options: { source: 'title', maxLength: 96 },
-      validation: (Rule: any) => Rule.required(),
+      validation: (rule: Rule) => rule.required(),
     },
     {
       name: 'author',
