@@ -24,8 +24,8 @@ export function LeadForm() {
   if (status === 'success') {
     return (
       <div className="bg-success-100 border border-success-500 rounded-md p-4 text-success-500 font-sans text-sm">
-        <strong className="block mb-1">¡Solicitud recibida!</strong>
-        En menos de 48h te enviaremos una propuesta.
+        <strong className="block mb-1">Solicitud recibida.</strong>
+        En menos de 48h coordinaremos una conversación estratégica.
       </div>
     );
   }
@@ -46,7 +46,7 @@ export function LeadForm() {
       <div className="flex flex-col gap-1">
         <textarea 
           name="problem" 
-          placeholder="Cuéntanos el problema en 3 líneas..." 
+          placeholder="Cuéntanos el problema, el equipo y el resultado esperado..." 
           rows={3}
           className="bg-bg text-fg-1 border border-border-2 focus:border-accent outline-none rounded-md px-3 py-2 text-sm font-sans placeholder:text-fg-4 transition-colors resize-none"
           required
@@ -59,7 +59,7 @@ export function LeadForm() {
         disabled={status === 'loading'}
         className="font-sans text-[14px] font-semibold rounded-md px-4 py-2.5 cursor-pointer border border-transparent bg-brand-cyan text-brand-cyan-ink transition-all duration-180 ease-out flex justify-center items-center gap-2 hover:bg-c-400 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {status === 'loading' ? 'Enviando...' : 'Solicita una demo'}
+        {status === 'loading' ? 'Enviando...' : 'Diagnosticar mi problema'}
       </button>
     </form>
   );

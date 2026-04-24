@@ -5,16 +5,16 @@ export default function BlogListing() {
   // Simularemos los posts mientras configuras tu projectId
 
   const mockPosts = [
-    { slug: 'factorias-de-agentes', title: 'Factorías de Agentes: Automatización End-to-End', date: '24 Abril 2026', excerpt: 'Cómo equipos de agentes IA coordinados están revolucionando la producción de contenido.' },
-    { slug: 'anatomia-embudo-perfecto', title: 'Del Logo al Cierre: Anatomía del Embudo Perfecto', date: '15 Abril 2026', excerpt: 'Más allá de la identidad corporativa pyme: cómo el diseño estratégico nutre la relación con el cliente.' },
-    { slug: 'rentabilidad-transferencia', title: 'La Rentabilidad de la Transferencia Tecnológica', date: '02 Abril 2026', excerpt: 'El verdadero ROI de capacitar y mentorear internamente a los líderes de tu empresa.' },
+    { slug: 'dirigir-agentes-ia', title: 'Aprende a dirigir agentes de IA', date: '24 Abril 2026', excerpt: 'Cómo pasar de usar herramientas sueltas a delegar, evaluar y gobernar sistemas de agentes con criterio.' },
+    { slug: 'ia-sector-publico-privado', title: 'IA aplicada para sector público y privado', date: '15 Abril 2026', excerpt: 'Qué problemas conviene automatizar, cuáles requieren rediseño operativo y cómo medir valor sin caja negra.' },
+    { slug: 'performance-marketing-estrategico', title: 'Performance marketing con pensamiento estratégico', date: '02 Abril 2026', excerpt: 'Cómo conectar oferta, audiencias, experimentos y seguimiento comercial para crecer con evidencia.' },
   ];
 
   return (
     <div className="pt-[140px] pb-[96px] max-w-[800px] mx-auto px-8 min-h-screen">
-      <span className="font-sans font-semibold text-[11px] tracking-[0.1em] uppercase text-accent mb-[14px] inline-block">Radar de Inteligencia</span>
+      <span className="font-sans font-semibold text-[11px] tracking-[0.1em] uppercase text-accent mb-[14px] inline-block">Radar de decisión</span>
       <h1 className="font-display font-bold text-[clamp(40px,5vw,64px)] leading-[1.05] tracking-[-0.025em] mb-[48px] text-fg-1 text-balance">
-        Artículos, análisis y código abierto.
+        Ideas para resolver problemas y dirigir mejor la IA.
       </h1>
 
       <div className="flex flex-col gap-[32px]">

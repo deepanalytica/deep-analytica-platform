@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Deep Analytica — Consulting & Data",
-  description: "Datos que responden preguntas de negocio. Consultoría, Análisis e IA aplicada.",
+  title: "Deep Analytica — Consultoría estratégica, marketing e IA aplicada",
+  description: "Resolvemos problemas estratégicos con performance marketing, agentes de IA y transferencia de capacidades para organizaciones públicas y privadas.",
 };
 
 export default function RootLayout({
