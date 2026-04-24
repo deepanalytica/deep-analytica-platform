@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-cyan: var(--brand-cyan);
+  --color-brand-cyan-ink: var(--brand-cyan-ink);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-white: var(--brand-white);
+
+  --color-n-950: var(--n-950);
+  --color-n-900: var(--n-900);
+  --color-n-800: var(--n-800);
+  --color-n-700: var(--n-700);
+  --color-n-600: var(--n-600);
+  --color-n-500: var(--n-500);
+  --color-n-400: var(--n-400);
+  --color-n-300: var(--n-300);
+  --color-n-200: var(--n-200);
+  --color-n-100: var(--n-100);
+  --color-n-050: var(--n-050);
+
+  --color-c-900: var(--c-900);
+  --color-c-800: var(--c-800);
+  --color-c-700: var(--c-700);
+  --color-c-600: var(--c-600);
+  --color-c-500: var(--c-500);
+  --color-c-400: var(--c-400);
+  --color-c-300: var(--c-300);
+  --color-c-200: var(--c-200);
+  --color-c-100: var(--c-100);
+  --color-c-050: var(--c-050);
+
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-bg-inverted: var(--bg-inverted);
+
+  --color-fg-1: var(--fg-1);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
+  --color-fg-on-accent: var(--fg-on-accent);
+  --color-fg-on-inverted: var(--fg-on-inverted);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-press: var(--accent-press);
+  --color-accent-soft: var(--accent-soft);
+
+  --color-border-1: var(--border-1);
+  --color-border-2: var(--border-2);
+  --color-border-3: var(--border-3);
+  
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+/* ---------- Webfonts ---------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Core brand */
+    --brand-cyan:      #33E1ED;
+    --brand-cyan-ink:  #0B2E33;
+    --brand-ink:       #2D2D44;
+    --brand-white:     #F7F8FF;
+
+    /* Neutral scale */
+    --n-950: #1C1C2E;
+    --n-900: #2D2D44;
+    --n-800: #3C3C55;
+    --n-700: #575773;
+    --n-600: #737391;
+    --n-500: #9494AE;
+    --n-400: #B4B4C8;
+    --n-300: #CFCFDD;
+    --n-200: #E2E2EC;
+    --n-100: #EDEEF5;
+    --n-050: #F7F8FF;
+
+    /* Cyan scale */
+    --c-900: #0B5B61;
+    --c-800: #127A82;
+    --c-700: #1A9CA6;
+    --c-600: #22BDC9;
+    --c-500: #33E1ED;
+    --c-400: #5CE8F1;
+    --c-300: #8AEFF5;
+    --c-200: #B9F6F9;
+    --c-100: #DEFAFC;
+    --c-050: #F0FDFE;
+
+    /* Semantic surfaces — LIGHT (default) */
+    --bg:             var(--n-050);
+    --bg-elevated:    #FFFFFF;
+    --bg-sunken:      var(--n-100);
+    --bg-inverted:    var(--n-900);
+
+    --fg-1:           var(--n-900);
+    --fg-2:           var(--n-700);
+    --fg-3:           var(--n-600);
+    --fg-4:           var(--n-500);
+    --fg-on-accent:   var(--brand-cyan-ink);
+    --fg-on-inverted: var(--n-050);
+
+    --border-1:       var(--n-200);
+    --border-2:       var(--n-300);
+    --border-3:       var(--n-400);
+    --hairline:       rgba(45,45,68,0.08);
+
+    --accent:         var(--brand-cyan);
+    --accent-hover:   var(--c-600);
+    --accent-press:   var(--c-700);
+    --accent-soft:    var(--c-100);
+    --focus-ring:     color-mix(in srgb, var(--brand-cyan) 55%, transparent);
+
+    /* Typography */
+    --font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+    --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  .dark {
+    --bg:             var(--n-900);
+    --bg-elevated:    var(--n-800);
+    --bg-sunken:      var(--n-950);
+    --bg-inverted:    var(--n-050);
+
+    --fg-1:           var(--n-050);
+    --fg-2:           var(--n-300);
+    --fg-3:           var(--n-400);
+    --fg-4:           var(--n-500);
+    --fg-on-accent:   var(--brand-cyan-ink);
+    --fg-on-inverted: var(--n-900);
+
+    --border-1:       rgba(247,248,255,0.08);
+    --border-2:       rgba(247,248,255,0.14);
+    --border-3:       rgba(247,248,255,0.22);
+    --hairline:       rgba(247,248,255,0.06);
+
+    --accent:         var(--brand-cyan);
+    --accent-hover:   var(--c-400);
+    --accent-press:   var(--c-300);
+    --accent-soft:    rgba(51,225,237,0.12);
+    --focus-ring:     color-mix(in srgb, var(--brand-cyan) 65%, transparent);
+  }
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--fg-1);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
