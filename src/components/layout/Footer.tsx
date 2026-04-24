@@ -9,7 +9,7 @@ export function Footer() {
           <span>© 2026 Deep Analytica</span>
         </div>
         <div>
-          contacto@deepanalytica.com · Madrid
+          contacto@deepanalytica.com · Chile
         </div>
       </div>
     </footer>
