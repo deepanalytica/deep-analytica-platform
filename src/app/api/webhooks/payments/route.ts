@@ -20,10 +20,10 @@ export async function POST(req: Request) {
       .update(rawBody)
       .digest('hex');
 
-    // IMPORTANTE: En producción usar validación real dependiendo de la pasarela de pago (MercadoPago/Webpay usan diferentes esquemas)
-    // if (expectedSignature !== signatureHeader) {
-    //   return NextResponse.json({ error: 'Firma inválida' }, { status: 401 });
-    // }
+    // IMPORTANTE: En producción usar validación real dependiendo de la pasarela de pago
+    if (expectedSignature !== signatureHeader) {
+      return NextResponse.json({ error: 'Firma inválida' }, { status: 401 });
+    }
 
     // 3. Parsear la información del pago una vez verificada su autenticidad
     const event = JSON.parse(rawBody);
