@@ -1,12 +1,19 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Navbar() {
   return (
     <header className="sticky top-0 bg-bg/88 backdrop-blur-md border-b border-border-1 z-10">
       <div className="max-w-[1200px] mx-auto px-8 py-[18px] flex items-center justify-between">
         <Link href="/">
-          {/* Logo is white since it's dark theme default */}
-          <span className="font-display font-bold text-xl tracking-tight text-fg-1">Deep Analytica</span>
+          <Image 
+            src="/logo-dark-bg.svg" 
+            alt="Deep Analytica" 
+            width={180} 
+            height={22} 
+            className="h-[22px] w-auto block" 
+            priority 
+          />
         </Link>
         <nav>
           <ul className="flex gap-7 list-none m-0 p-0">
