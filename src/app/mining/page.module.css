@@ -1,0 +1,104 @@
+
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  background: #07090b;
+  color: #f2f4f5;
+}
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 28px 22px;
+  border-right: 1px solid #20252b;
+  background: #0b0e11;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.sidebar h1 { margin: 4px 0; font-size: 22px; letter-spacing: -0.03em; }
+.sidebar nav { display: grid; gap: 6px; }
+.sidebar nav a { padding: 10px 12px; border-radius: 8px; color: #929aa3; font-size: 14px; }
+.sidebar nav .active { background: #151a1f; color: #fff; border: 1px solid #242b32; }
+.eyebrow { color: #8e98a3; font-size: 11px; font-weight: 700; letter-spacing: .14em; margin: 0 0 8px; }
+.muted { color: #77808a; font-size: 12px; }
+.trust { border: 1px solid #283039; padding: 14px; border-radius: 10px; display: grid; gap: 4px; }
+.trust span, .trust small { color: #7f8994; font-size: 11px; }
+.trust strong { font-size: 16px; }
+.content { padding: 34px; max-width: 1440px; width: 100%; margin: 0 auto; }
+.header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.header h2 { font-size: 34px; letter-spacing: -0.04em; margin: 8px 0; }
+.header p { color: #8e98a3; margin: 0; }
+.badges { display: flex; gap: 8px; }
+.badges span { border: 1px solid #313941; border-radius: 999px; padding: 5px 8px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.badges .demo { color: #f2c86b; border-color: #66532d; }
+.capital { text-align: right; display: grid; gap: 3px; }
+.capital span { color: #8e98a3; font-size: 11px; }
+.capital strong { font-size: 24px; }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
+.metrics article, .panel, .panelWide { border: 1px solid #20262c; background: #0d1115; border-radius: 12px; }
+.metrics article { padding: 18px; display: grid; gap: 4px; }
+.metrics span, .forecast span { color: #7f8994; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.metrics strong { font-size: 28px; }
+.metrics small, .forecast small { color: #68717a; }
+.grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+.panel, .panelWide { padding: 20px; }
+.panelWide { grid-column: 1 / -1; }
+.panel h3, .panelWide h3 { margin: 0 0 8px; font-size: 19px; }
+.panelHeader { display: flex; justify-content: space-between; gap: 20px; }
+.panelHeader p { color: #8e98a3; }
+.panelHeader select { align-self: flex-start; background: #11171c; color: #fff; border: 1px solid #2a333c; border-radius: 8px; padding: 9px; }
+.options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+.option, .optionFocus { border: 1px solid #252d35; border-radius: 10px; padding: 16px; background: #0a0e12; }
+.optionFocus { border-color: #5d7a72; background: #0f1715; }
+.option div, .optionFocus div { display: flex; gap: 8px; align-items: center; }
+.option div span, .optionFocus div span { width: 22px; height: 22px; display: grid; place-items: center; border: 1px solid #39434c; border-radius: 6px; font-size: 10px; }
+.option b, .optionFocus b { display: block; font-size: 22px; margin: 18px 0 8px; }
+.option p, .optionFocus p { color: #8e98a3; min-height: 42px; }
+.option small, .optionFocus small { color: #738078; }
+.humanKey { margin-top: 12px; padding: 15px; border: 1px solid #574b2b; background: #15130d; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+.humanKey p { margin: 4px 0 0; color: #a39b82; }
+.humanKey span { color: #f1ca72; font-size: 11px; font-weight: 800; letter-spacing: .1em; }
+.steps { display: grid; gap: 10px; margin-top: 16px; }
+.step { display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 9px; }
+.step p { margin: 0; color: #c9cfd4; font-size: 13px; }
+.step small { color: #6f7881; }
+.step span { width: 8px; height: 8px; border-radius: 999px; background: #57616a; }
+.step .done { background: #79aa95; }
+.step .blocked { background: #bc6e64; }
+.step .pending { background: #b59a5a; }
+.gauge { display: flex; align-items: baseline; margin: 14px 0; }
+.gauge strong { font-size: 42px; }
+.gauge span { color: #68717a; }
+.blocker, .warning { border-left: 2px solid #b4635a; padding: 8px 10px; margin: 8px 0; background: #151010; }
+.warning { border-color: #a78d50; background: #14130f; }
+.blocker b, .warning b { font-size: 10px; letter-spacing: .08em; }
+.blocker p, .warning p { margin: 4px 0 0; color: #aeb4b9; font-size: 12px; }
+.forecast { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 14px; }
+.forecast > div { background: #090d10; border: 1px solid #20272d; border-radius: 9px; padding: 14px; display: grid; gap: 5px; }
+.forecast strong { font-size: 18px; }
+.trace { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.claim { border: 1px solid #252c33; background: #090d10; border-radius: 10px; padding: 14px; }
+.claimTop { display: flex; justify-content: space-between; }
+.claimTop span { text-transform: uppercase; font-size: 10px; letter-spacing: .08em; color: #85a99a; }
+.claimTop strong { font-size: 10px; color: #858f98; text-transform: uppercase; }
+.claim p { line-height: 1.45; }
+.claim small { color: #7f8994; }
+.evidenceRow { display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0; }
+.evidenceRow span { padding: 4px 6px; border: 1px solid #283139; border-radius: 5px; color: #9ea6ad; font-size: 10px; }
+@media (max-width: 900px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; gap: 20px; }
+  .sidebar nav { grid-template-columns: repeat(4, auto); overflow-x: auto; }
+  .content { padding: 18px; }
+  .metrics, .options, .trace, .forecast { grid-template-columns: 1fr 1fr; }
+  .grid { grid-template-columns: 1fr; }
+  .panelWide { grid-column: auto; }
+}
+@media (max-width: 620px) {
+  .header { align-items: flex-start; flex-direction: column; }
+  .capital { text-align: left; }
+  .metrics, .options, .trace, .forecast { grid-template-columns: 1fr; }
+}
