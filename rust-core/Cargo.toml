@@ -1,0 +1,12 @@
+[package]
+name = "deep-mining-trust-core"
+version = "0.2.0"
+edition = "2021"
+description = "Canonical Meta-Harness and Praxios decision-gate core for Deep Mining Intelligence."
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
