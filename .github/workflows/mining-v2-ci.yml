@@ -1,0 +1,32 @@
+name: Mining V2 CI
+
+on:
+  push:
+    branches:
+      - feat/deep-mining-experience-v2
+  pull_request:
+    paths:
+      - "src/app/mining-v2/**"
+      - "src/lib/mining-v2/**"
+      - "src/middleware.ts"
+      - "rust-core/**"
+      - ".github/workflows/mining-v2-ci.yml"
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  rust-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --manifest-path rust-core/Cargo.toml
