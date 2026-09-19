@@ -216,6 +216,44 @@ export default function TerrainTwin() {
         onWheel={wheel}
       />
 
+      <svg className={styles.geoOverlay} viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="uncertaintyFill" x1="0" x2="1">
+            <stop offset="0%" stopColor="#d7a451" stopOpacity=".03" />
+            <stop offset="50%" stopColor="#d7a451" stopOpacity=".14" />
+            <stop offset="100%" stopColor="#d7a451" stopOpacity=".02" />
+          </linearGradient>
+        </defs>
+
+        <g className={styles.contours}>
+          <path d="M70 445 C190 365 290 380 405 320 S650 230 925 280" />
+          <path d="M60 476 C180 405 315 410 430 352 S690 268 942 310" />
+          <path d="M55 505 C190 450 318 447 455 398 S705 320 950 350" />
+        </g>
+
+        <g className={styles.expansionBoundary}>
+          <path d="M535 210 L760 188 L850 302 L726 392 L520 344 Z" />
+        </g>
+
+        <g className={styles.uncertaintyEnvelope}>
+          <path d="M245 250 C300 190 390 184 458 235 C500 266 510 328 466 366 C392 418 286 390 235 326 C218 305 220 278 245 250 Z" fill="url(#uncertaintyFill)" />
+        </g>
+
+        <g className={styles.drillholes}>
+          <line x1="318" y1="260" x2="370" y2="430" />
+          <line x1="352" y1="245" x2="398" y2="438" />
+          <line x1="392" y1="252" x2="425" y2="447" />
+          <line x1="648" y1="300" x2="612" y2="475" />
+          <line x1="688" y1="292" x2="657" y2="482" />
+        </g>
+
+        <g className={styles.geoLabels}>
+          <text x="300" y="230">T-NORTH · HYPOTHESIS</text>
+          <text x="720" y="180">F4 · EXPANSION FOOTPRINT</text>
+          <text x="610" y="500">DRILL TRACES · OBSERVED</text>
+        </g>
+      </svg>
+
       <div className={styles.twinTop}>
         <div>
           <span>GEO / TEMPORAL TWIN</span>
