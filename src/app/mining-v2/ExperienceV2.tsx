@@ -5,119 +5,174 @@ import { experienceData, Scenario, TrustState } from "@/lib/mining-v2/experience
 import TerrainTwin from "./TerrainTwin";
 import styles from "./page.module.css";
 
-type RailTab = "evidence" | "architecture" | "tests" | "math";
+type Lens = "decision" | "evidence" | "system";
+type TimeMode = "history" | "now" | "forecast";
 
-function StateBadge({ state }: { state: TrustState }) {
-  const label = state === "verified" ? "Validado" : state === "conditional" ? "Condicional" : state === "blocked" ? "Bloqueo" : "Pendiente";
-  return <span className={styles[state]}>{label}</span>;
+function StateDot({ state }: { state: TrustState }) {
+  return <span className={`${styles.stateDot} ${styles[state]}`} aria-label={state} />;
 }
 
-function Sparkline() {
+function ScenarioStrip({
+  scenario,
+  active,
+  onClick,
+}: {
+  scenario: Scenario;
+  active: boolean;
+  onClick: () => void;
+}) {
   return (
-    <svg className={styles.sparkline} viewBox="0 0 260 70" role="img" aria-label="Serie histórica y rango de forecast ilustrativo">
-      <defs>
-        <linearGradient id="range" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="#55d6c2" stopOpacity=".32" />
-          <stop offset="100%" stopColor="#55d6c2" stopOpacity=".02" />
-        </linearGradient>
-      </defs>
-      <path d="M8 52 L34 49 L59 53 L84 43 L109 41 L135 34 L160 31 L185 26 L210 22 L252 17 L252 43 L210 46 L185 48 L160 47 L135 45 Z" fill="url(#range)" />
-      <polyline points="8,52 34,49 59,53 84,43 109,41 135,34" fill="none" stroke="#d4dde2" strokeWidth="2" />
-      <polyline points="135,34 160,32 185,29 210,25 252,22" fill="none" stroke="#55d6c2" strokeWidth="2" strokeDasharray="5 4" />
-      <circle cx="135" cy="34" r="3.5" fill="#e2b454" />
-    </svg>
-  );
-}
-
-function Rail({ tab, setTab }: { tab: RailTab; setTab: (tab: RailTab) => void }) {
-  return (
-    <aside className={styles.rail}>
-      <div className={styles.railHead}>
-        <div>
-          <span>EVIDENCIA / CONFIANZA</span>
-          <strong>Sin cajas negras</strong>
-        </div>
-        <button title="Filtrar">+</button>
+    <button className={active ? styles.scenarioActive : styles.scenario} onClick={onClick}>
+      <span className={styles.scenarioLetter}>{scenario.id}</span>
+      <div>
+        <strong>{scenario.label}</strong>
+        <small>{scenario.capital} · {scenario.horizon}</small>
       </div>
-      <div className={styles.railTabs}>
-        {(["evidence","architecture","tests","math"] as RailTab[]).map((item) => (
-          <button key={item} onClick={() => setTab(item)} className={tab === item ? styles.railActive : ""}>
-            {item === "evidence" ? "Evidencia" : item === "architecture" ? "Arquitectura" : item === "tests" ? "Pruebas" : "Matemática"}
-          </button>
-        ))}
+      <div className={styles.scenarioReturn}>
+        <b>{scenario.returnMetric}</b>
+        <small>{scenario.uncertainty} incertidumbre</small>
       </div>
-
-      <div className={styles.railBody}>
-        {tab === "evidence" && experienceData.evidence.map((item) => (
-          <article className={styles.evidenceItem} key={item.id}>
-            <div className={styles.evidenceIcon}>{item.id.split("-")[1]}</div>
-            <div>
-              <strong>{item.title}</strong>
-              <p>{item.source} · actualizado hace {item.updated}</p>
-              <small>{item.note}</small>
-            </div>
-            <StateBadge state={item.state} />
-          </article>
-        ))}
-
-        {tab === "architecture" && (
-          <div className={styles.architecture}>
-            {experienceData.architecture.map(([name, text], index) => (
-              <article key={name}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <div><strong>{name}</strong><p>{text}</p></div>
-              </article>
-            ))}
-            <div className={styles.archFlow}>
-              <span>Deep Geo</span><i>→</i><span>Praxios</span><i>→</i><span>Meta-Harness</span><i>→</i><span>Humano</span>
-            </div>
-          </div>
-        )}
-
-        {tab === "tests" && (
-          <div className={styles.testList}>
-            {experienceData.tests.map(([id, name, state]) => (
-              <article key={id}>
-                <div><b>{id}</b><strong>{name}</strong></div>
-                <span className={state === "definido" ? styles.testDefined : styles.testPending}>{state}</span>
-              </article>
-            ))}
-            <p className={styles.disclaimer}>La interfaz distingue reglas definidas de pruebas realmente ejecutadas. No se presenta un check verde sin evidencia de ejecución.</p>
-          </div>
-        )}
-
-        {tab === "math" && (
-          <div className={styles.math}>
-            <article><span>Trust gate v0.1</span><strong>S = max(0, 100 − 30B − 8W)</strong><p>B = bloqueos · W = advertencias. Regla operacional, no probabilidad.</p></article>
-            <article><span>Forecast gate</span><strong>E(model) &lt; E(baseline)</strong><p>Si no supera baseline en backtest, el forecast no gana peso decisional.</p></article>
-            <article><span>Epistemic transition</span><strong>Source → Evidence → Claim → Decision</strong><p>Una inferencia no puede mutar silenciosamente a hecho.</p></article>
-            <article><span>Human key</span><strong>impact = high ⇒ approval ≠ ∅</strong><p>La arquitectura bloquea ejecución sin decisión humana explícita.</p></article>
-          </div>
-        )}
-      </div>
-    </aside>
-  );
-}
-
-function ScenarioCard({ scenario, active, onSelect }: { scenario: Scenario; active: boolean; onSelect: () => void }) {
-  return (
-    <button className={active ? styles.scenarioActive : styles.scenario} onClick={onSelect}>
-      <div className={styles.scenarioTitle}><span>{scenario.id}</span><div><strong>{scenario.label}</strong><small>{scenario.subtitle}</small></div></div>
-      <div className={styles.scenarioMetrics}>
-        <div><span>Capital</span><b>{scenario.capital}</b></div>
-        <div><span>Horizonte</span><b>{scenario.horizon}</b></div>
-        <div><span>Valor escenario</span><b>{scenario.value}</b></div>
-        <div><span>Retorno</span><b>{scenario.returnMetric}</b></div>
-      </div>
-      <p>{scenario.summary}</p>
     </button>
   );
 }
 
+function Timeline({ mode, setMode }: { mode: TimeMode; setMode: (mode: TimeMode) => void }) {
+  return (
+    <div className={styles.timeline}>
+      <div className={styles.timelineLabels}>
+        <button className={mode === "history" ? styles.timelineActive : ""} onClick={() => setMode("history")}>2018—2025</button>
+        <button className={mode === "now" ? styles.timelineActive : ""} onClick={() => setMode("now")}>HOY</button>
+        <button className={mode === "forecast" ? styles.timelineActive : ""} onClick={() => setMode("forecast")}>2027—2031</button>
+      </div>
+      <div className={styles.timelineTrack}>
+        <span className={styles.historyTrack} />
+        <span className={styles.nowMarker} />
+        <span className={styles.forecastTrack} />
+        <i style={{ left: "17%" }}><b>Campaña 01</b></i>
+        <i style={{ left: "42%" }}><b>Modelo v3</b></i>
+        <i style={{ left: "68%" }}><b>Gate G4</b></i>
+        <i style={{ left: "86%" }}><b>Expansión</b></i>
+      </div>
+      <div className={styles.timelineCaption}>
+        <span>observado</span>
+        <span>presente</span>
+        <span>proyección / escenario</span>
+      </div>
+    </div>
+  );
+}
+
+function DecisionLens({ scenario }: { scenario: Scenario }) {
+  return (
+    <div className={styles.lensBody}>
+      <section className={styles.heroDecision}>
+        <span>DECISIÓN ABIERTA</span>
+        <h2>{scenario.label}</h2>
+        <p>{scenario.summary}</p>
+      </section>
+
+      <section className={styles.metricLine}>
+        <div><span>Capital</span><strong>{scenario.capital}</strong></div>
+        <div><span>Horizonte</span><strong>{scenario.horizon}</strong></div>
+        <div><span>Retorno</span><strong>{scenario.returnMetric}</strong></div>
+      </section>
+
+      <section className={styles.tradeoffs}>
+        <div><span>Reversibilidad</span><b>{scenario.reversibility}</b></div>
+        <div><span>Presión hídrica</span><b>{scenario.water}</b></div>
+        <div><span>Incertidumbre</span><b>{scenario.uncertainty}</b></div>
+      </section>
+
+      <section className={styles.blocker}>
+        <span>PRINCIPAL BLOQUEO</span>
+        <strong>Disponibilidad hídrica para expansión</strong>
+        <p>La decisión permanece en HOLD hasta cerrar evidencia material y revisión humana.</p>
+      </section>
+
+      <section className={styles.decisionActions}>
+        <button>Solicitar evidencia</button>
+        <button className={styles.primaryAction}>Preparar revisión humana</button>
+      </section>
+    </div>
+  );
+}
+
+function EvidenceLens() {
+  return (
+    <div className={styles.lensBody}>
+      <section className={styles.heroDecision}>
+        <span>TRAZABILIDAD</span>
+        <h2>Qué sabemos. Qué no.</h2>
+        <p>Cada afirmación se puede recorrer hasta la fuente que la sostiene.</p>
+      </section>
+
+      <div className={styles.evidenceStack}>
+        {experienceData.evidence.map((item) => (
+          <button className={styles.evidenceRow} key={item.id}>
+            <StateDot state={item.state} />
+            <div>
+              <strong>{item.title}</strong>
+              <span>{item.source} · {item.updated}</span>
+            </div>
+            <small>{item.id}</small>
+          </button>
+        ))}
+      </div>
+
+      <section className={styles.traceChain}>
+        <span>TRACE ACTIVO</span>
+        <div>
+          <b>Fuente</b><i>→</i><b>Evidencia</b><i>→</i><b>Claim</b><i>→</i><b>Decisión</b>
+        </div>
+        <p>Ningún nodo puede elevarse de nivel epistemológico sin reglas explícitas del Meta-Harness.</p>
+      </section>
+    </div>
+  );
+}
+
+function SystemLens() {
+  return (
+    <div className={styles.lensBody}>
+      <section className={styles.heroDecision}>
+        <span>SISTEMA DE CONFIANZA</span>
+        <h2>No es un score. Es una membrana.</h2>
+        <p>Praxios ejecuta el flujo. Meta-Harness determina qué puede cruzarlo.</p>
+      </section>
+
+      <div className={styles.systemStack}>
+        {experienceData.architecture.map(([name, text], index) => (
+          <div key={name} className={styles.systemLayer}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <div><strong>{name}</strong><p>{text}</p></div>
+          </div>
+        ))}
+      </div>
+
+      <section className={styles.equation}>
+        <span>REGLA OPERACIONAL ACTIVA</span>
+        <strong>S = max(0, 100 − 30B − 8W)</strong>
+        <p>B = bloqueos · W = advertencias. No es una probabilidad de éxito.</p>
+      </section>
+
+      <section className={styles.testStatus}>
+        <span>RUST CORE</span>
+        <strong>Gate engine · tests activos</strong>
+        <p>Decisiones high-impact requieren aprobación humana explícita.</p>
+      </section>
+    </div>
+  );
+}
+
 export default function ExperienceV2() {
-  const [railTab, setRailTab] = useState<RailTab>("evidence");
+  const [lens, setLens] = useState<Lens>("decision");
   const [scenarioId, setScenarioId] = useState("A");
-  const selected = useMemo(() => experienceData.scenarios.find((s) => s.id === scenarioId)!, [scenarioId]);
+  const [timeMode, setTimeMode] = useState<TimeMode>("now");
+  const [inspectorOpen, setInspectorOpen] = useState(true);
+
+  const scenario = useMemo(
+    () => experienceData.scenarios.find((item) => item.id === scenarioId) ?? experienceData.scenarios[0],
+    [scenarioId]
+  );
 
   async function logout() {
     await fetch("/api/mining-v2/logout", { method: "POST" });
@@ -130,95 +185,109 @@ export default function ExperienceV2() {
         <div className={styles.brand}>
           <div className={styles.mark}>DA</div>
           <div><strong>DEEP ANALYTICA</strong><span>MINING INTELLIGENCE</span></div>
-          <p>FROM EARTH DATA<br/>TO BETTER DECISIONS</p>
         </div>
-        <nav>
-          <button className={styles.navActive}>Decisión</button>
-          <button>Portafolio</button>
-          <button>Exploración</button>
-          <button>Operaciones</button>
-          <button>Mercado</button>
-          <button>Riesgo</button>
-        </nav>
-        <div className={styles.system}>
-          <span><i /> Praxios OS</span>
+
+        <div className={styles.projectCrumb}>
+          <span>PROJECT / 014</span>
+          <strong>LOS ANDES</strong>
+          <small>Cu-Au · Chile</small>
+        </div>
+
+        <div className={styles.topActions}>
+          <span className={styles.live}><i /> PRAXIOS LIVE</span>
+          <button onClick={() => setInspectorOpen((value) => !value)}>{inspectorOpen ? "Ocultar contexto" : "Mostrar contexto"}</button>
           <button onClick={logout}>Salir</button>
         </div>
       </header>
 
-      <aside className={styles.leftbar}>
-        {["⌂","◎","◇","△","≋","!","▥"].map((icon, index) => (
-          <button key={index} className={index === 1 ? styles.leftActive : ""}><b>{icon}</b><span>{["Inicio","Deep Geo","Decisiones","Escenarios","Evidencia","Riesgos","Mercado"][index]}</span></button>
+      <nav className={styles.toolrail} aria-label="Herramientas">
+        {[
+          ["01", "Geo"],
+          ["02", "Tiempo"],
+          ["03", "Decidir"],
+          ["04", "Evidencia"],
+          ["05", "Riesgo"],
+        ].map(([n, label], index) => (
+          <button key={label} className={index === 0 ? styles.toolActive : ""}>
+            <b>{n}</b><span>{label}</span>
+          </button>
         ))}
-        <small>V2 · PRIVATE</small>
-      </aside>
+        <div className={styles.toolSpacer} />
+        <button className={styles.toolTrust}><b>68</b><span>Trust</span></button>
+      </nav>
 
-      <section className={styles.command}>
-        <div className={styles.activeDecision}>
-          <span>DECISIÓN ACTIVA</span>
-          <strong>Expandir Operación Los Andes</strong>
-          <small>{experienceData.project.subtitle}</small>
-        </div>
-        <div><span>CAPITAL EN JUEGO</span><strong>{experienceData.project.capital}</strong><small>escenario seleccionado</small></div>
-        <div><span>HORIZONTE</span><strong>{experienceData.project.horizon}</strong><small>ventana estratégica</small></div>
-        <div className={styles.trustKpi}>
-          <span>ESTADO DE CONFIANZA</span>
-          <div className={styles.ring} style={{ "--score": experienceData.project.trust } as React.CSSProperties}><b>{experienceData.project.trust}%</b></div>
-          <small>{experienceData.project.trustLabel}</small>
-        </div>
-        <div className={styles.nextAction}><span>ACCIÓN PENDIENTE</span><strong>{experienceData.project.nextAction}</strong><button>Ver bloqueos →</button></div>
-      </section>
+      <section className={styles.stage}>
+        <TerrainTwin />
 
-      <section className={styles.workspace}>
-        <div className={styles.center}>
-          <TerrainTwin />
-
-          <section className={styles.scenarios}>
-            <div className={styles.sectionHead}>
-              <div><span>ESCENARIOS / COMPARAR</span><strong>Evalúa alternativas. La decisión es tuya.</strong></div>
-              <div className={styles.scenarioMeta}><span>Seleccionado</span><b>{selected.label}</b></div>
-            </div>
-            <div className={styles.scenarioGrid}>
-              {experienceData.scenarios.map((scenario) => (
-                <ScenarioCard key={scenario.id} scenario={scenario} active={scenario.id === scenarioId} onSelect={() => setScenarioId(scenario.id)} />
-              ))}
-              <article className={styles.forecastCard}>
-                <div><span>SERIE / FORECAST</span><strong>Producción mensual</strong></div>
-                <Sparkline />
-                <div className={styles.forecastMeta}><span>TimesFM adapter</span><span>sMAPE 11.8</span><span>baseline 15.6</span></div>
-                <small>Rango predictivo visible; forecast ≠ hecho observado.</small>
-              </article>
-            </div>
-          </section>
-
-          <section className={styles.harnessBar}>
-            <div className={styles.harnessIntro}><span>META-HARNESS</span><strong>Membrana de confianza y trazabilidad</strong></div>
-            <div className={styles.harnessFlow}>
-              <div className={styles.flowOk}><b>Datos</b><small>3 fuentes condicionadas</small></div>
-              <i>→</i>
-              <div className={styles.flowWarn}><b>Modelos</b><small>1 advertencia</small></div>
-              <i>→</i>
-              <div className={styles.flowBlock}><b>Afirmaciones</b><small>2 bloqueos</small></div>
-              <i>→</i>
-              <div className={styles.flowWarn}><b>Decisión</b><small>espera validación</small></div>
-            </div>
-            <div className={styles.harnessAction}><p>La decisión no puede avanzar mientras existan afirmaciones críticas sin evidencia suficiente.</p><button onClick={() => setRailTab("tests")}>Abrir pruebas →</button></div>
-          </section>
+        <div className={styles.decisionRibbon}>
+          <div className={styles.ribbonMain}>
+            <span>DECISIÓN ACTIVA</span>
+            <strong>¿Expandimos operación o compramos información?</strong>
+          </div>
+          <div><span>CAPITAL EXPUESTO</span><strong>{scenario.capital}</strong></div>
+          <div><span>GATE</span><strong className={styles.hold}>HOLD</strong></div>
+          <div><span>CONFIANZA</span><strong>{experienceData.project.trust}%</strong></div>
+          <button onClick={() => { setLens("system"); setInspectorOpen(true); }}>Por qué está bloqueado →</button>
         </div>
 
-        <Rail tab={railTab} setTab={setRailTab} />
-      </section>
+        <div className={styles.viewSwitch}>
+          <button className={timeMode === "history" ? styles.viewActive : ""} onClick={() => setTimeMode("history")}>REALIDAD</button>
+          <button className={timeMode === "now" ? styles.viewActive : ""} onClick={() => setTimeMode("now")}>AHORA</button>
+          <button className={timeMode === "forecast" ? styles.viewActive : ""} onClick={() => setTimeMode("forecast")}>ESCENARIO</button>
+        </div>
 
-      <section className={styles.approval}>
-        <div><span>PRAXIOS / ACCIÓN</span><strong>4 · Revisión técnica y financiera</strong><small>La aprobación humana sigue pendiente.</small></div>
-        <ol>
-          <li className={styles.done}>Análisis multifuente</li>
-          <li className={styles.warn}>Validación Meta-Harness</li>
-          <li>Revisión técnica</li>
-          <li>Aprobación humana</li>
-          <li>Ejecución / monitoreo</li>
-        </ol>
-        <div className={styles.approvalButtons}><button>Solicitar más análisis</button><button disabled>Aprobar siguiente fase</button></div>
+        <div className={styles.objectCallout}>
+          <span>OBJECT / T-NORTH</span>
+          <strong>Target Norte</strong>
+          <div><b>Hipótesis</b><b>Confianza moderada</b></div>
+          <p>Continuidad y profundidad aún no confirmadas.</p>
+        </div>
+
+        <div className={styles.stageMetrics}>
+          <div><span>NPV escenario</span><strong>{scenario.value}</strong></div>
+          <div><span>Agua</span><strong>{scenario.water}</strong></div>
+          <div><span>Reversibilidad</span><strong>{scenario.reversibility}</strong></div>
+        </div>
+
+        <Timeline mode={timeMode} setMode={setTimeMode} />
+
+        <div className={styles.scenarioDock}>
+          {experienceData.scenarios.map((item) => (
+            <ScenarioStrip
+              key={item.id}
+              scenario={item}
+              active={item.id === scenarioId}
+              onClick={() => setScenarioId(item.id)}
+            />
+          ))}
+        </div>
+
+        {inspectorOpen && (
+          <aside className={styles.inspector}>
+            <div className={styles.inspectorTabs}>
+              <button className={lens === "decision" ? styles.inspectorActive : ""} onClick={() => setLens("decision")}>Decisión</button>
+              <button className={lens === "evidence" ? styles.inspectorActive : ""} onClick={() => setLens("evidence")}>Evidencia</button>
+              <button className={lens === "system" ? styles.inspectorActive : ""} onClick={() => setLens("system")}>Sistema</button>
+            </div>
+            {lens === "decision" && <DecisionLens scenario={scenario} />}
+            {lens === "evidence" && <EvidenceLens />}
+            {lens === "system" && <SystemLens />}
+          </aside>
+        )}
+
+        <div className={styles.harnessMembrane}>
+          <span className={styles.membraneLabel}>META-HARNESS</span>
+          <div className={styles.membraneLine}>
+            <i className={styles.membranePass} />
+            <i className={styles.membranePass} />
+            <i className={styles.membraneWarn} />
+            <i className={styles.membraneBlock} />
+            <i className={styles.membranePending} />
+          </div>
+          <div className={styles.membraneText}>
+            <span>datos</span><span>modelo</span><span>claim</span><span>gate</span><span>humano</span>
+          </div>
+        </div>
       </section>
     </main>
   );
