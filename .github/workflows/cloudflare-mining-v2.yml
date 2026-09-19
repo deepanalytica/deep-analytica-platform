@@ -1,0 +1,101 @@
+name: Deploy Mining V2 to Cloudflare
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feat/deep-mining-experience-v2
+    paths:
+      - "src/app/mining-v2/**"
+      - "src/lib/mining-v2/**"
+      - "src/middleware.ts"
+      - "wrangler.jsonc"
+      - "open-next.config.ts"
+      - ".github/workflows/cloudflare-mining-v2.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Validate Cloudflare credentials
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || (echo "::error::Missing CLOUDFLARE_API_TOKEN" && exit 1)
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "::error::Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
+
+      - name: Prepare private beta credentials
+        id: beta
+        shell: bash
+        env:
+          SAVED_PASSWORD: ${{ secrets.DMI_ACCESS_PASSWORD }}
+          SAVED_SESSION_SECRET: ${{ secrets.DMI_SESSION_SECRET }}
+        run: |
+          if [ -n "$SAVED_PASSWORD" ]; then
+            ACCESS_PASSWORD="$SAVED_PASSWORD"
+            GENERATED="false"
+          else
+            ACCESS_PASSWORD="DMI-$(openssl rand -hex 8)"
+            GENERATED="true"
+          fi
+
+          if [ -n "$SAVED_SESSION_SECRET" ]; then
+            SESSION_SECRET="$SAVED_SESSION_SECRET"
+          else
+            SESSION_SECRET="$(openssl rand -hex 32)"
+          fi
+
+          echo "ACCESS_PASSWORD=$ACCESS_PASSWORD" >> "$GITHUB_ENV"
+          echo "SESSION_SECRET=$SESSION_SECRET" >> "$GITHUB_ENV"
+          echo "generated=$GENERATED" >> "$GITHUB_OUTPUT"
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Install Cloudflare adapter
+        run: npm install --no-save @opennextjs/cloudflare@latest wrangler@latest
+
+      - name: Build for Cloudflare Workers
+        run: npx opennextjs-cloudflare build
+
+      - name: Deploy worker
+        id: deploy
+        run: |
+          npx wrangler deploy --config wrangler.jsonc 2>&1 | tee /tmp/wrangler-deploy.log
+
+      - name: Set application password secret
+        shell: bash
+        run: printf '%s' "$ACCESS_PASSWORD" | npx wrangler secret put DMI_ACCESS_PASSWORD --name deep-mining-intelligence-v2
+
+      - name: Set session signing secret
+        shell: bash
+        run: printf '%s' "$SESSION_SECRET" | npx wrangler secret put DMI_SESSION_SECRET --name deep-mining-intelligence-v2
+
+      - name: Publish access details
+        shell: bash
+        run: |
+          URL=$(grep -Eo 'https://[^ ]+\.workers\.dev' /tmp/wrangler-deploy.log | tail -1 || true)
+          echo "### Deep Mining Intelligence V2" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL: ${URL:-see Wrangler output}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.beta.outputs.generated }}" = "true" ]; then
+            echo "Temporary password: `$ACCESS_PASSWORD`" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Password: using existing DMI_ACCESS_PASSWORD repository secret." >> "$GITHUB_STEP_SUMMARY"
+          fi
