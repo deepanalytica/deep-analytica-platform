@@ -22,6 +22,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Install Cloudflare type adapter for Next build
+        run: npm install --no-save @opennextjs/cloudflare@latest
       - run: npm run build
 
   rust-core:
