@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - main
       - feat/deep-mining-experience-v2
     paths:
       - "src/app/mining-v2/**"
