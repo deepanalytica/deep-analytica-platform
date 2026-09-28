@@ -44,6 +44,12 @@ jobs:
       - name: TypeScript
         run: npx tsc --noEmit
 
+      - name: PRAXIOS fixture lifecycle tests
+        run: npx vitest run src/app/praxios/lib/fixture.test.ts
+
+      - name: Next production build
+        run: npm run build
+
       - name: Summary
         if: always()
         shell: bash
@@ -53,4 +59,5 @@ jobs:
           echo "Branch: $GITHUB_REF_NAME" >> "$GITHUB_STEP_SUMMARY"
           echo "Route: /praxios" >> "$GITHUB_STEP_SUMMARY"
           echo "Runtime gateway: /api/praxios-runtime/[...path]" >> "$GITHUB_STEP_SUMMARY"
+          echo "Checks: TypeScript + fixture lifecycle tests + production build" >> "$GITHUB_STEP_SUMMARY"
           echo "Hosting deploy intentionally not coupled to this validation workflow." >> "$GITHUB_STEP_SUMMARY"
