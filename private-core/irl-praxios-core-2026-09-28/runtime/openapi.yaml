@@ -1,0 +1,249 @@
+openapi: 3.1.0
+info:
+  title: PRAXIOS Runtime API
+  version: 0.2.0
+  description: Governed execution API for PRAXIOS, Meta-Harness and Decision Room.
+servers:
+  - url: https://runtime.example.com
+paths:
+  /api/health:
+    get:
+      summary: Runtime health
+      responses:
+        '200':
+          description: Healthy runtime
+  /api/providers:
+    get:
+      summary: List configured provider adapters
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Provider registry }
+        '401': { description: Unauthorized }
+  /api/sessions:
+    post:
+      summary: Create a governed session
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [goal]
+              properties:
+                sessionId: { type: string }
+                goal: { type: string }
+                actor: { type: string }
+      responses:
+        '201': { description: Session snapshot }
+  /api/sessions/{sessionId}:
+    get:
+      summary: Read session snapshot
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200': { description: Session snapshot }
+        '404': { description: Unknown session }
+  /api/sessions/{sessionId}/evidence:
+    post:
+      summary: Register evidence
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [evidence]
+              properties:
+                actor: { type: string }
+                evidence: { $ref: '#/components/schemas/Evidence' }
+      responses:
+        '201': { description: Evidence registered }
+  /api/sessions/{sessionId}/claims:
+    post:
+      summary: Propose a claim
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [claim]
+              properties:
+                actor: { type: string }
+                claim: { $ref: '#/components/schemas/Claim' }
+      responses:
+        '201': { description: Claim proposed }
+  /api/sessions/{sessionId}/claims/{claimId}/review:
+    post:
+      summary: Record an independent claim review
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - name: claimId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Review recorded }
+  /api/sessions/{sessionId}/claims/{claimId}/verify:
+    post:
+      summary: Run Meta-Harness claim gates
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - name: claimId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: PASS REVIEW or BLOCK evaluation }
+  /api/sessions/{sessionId}/authorizations:
+    post:
+      summary: Request authorization for an action
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '201': { description: Authorization request created }
+        '409': { description: Preflight blocked }
+  /api/sessions/{sessionId}/authorizations/{authorizationId}:
+    post:
+      summary: Human approval or rejection
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - name: authorizationId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/HumanAuthority'
+      responses:
+        '200': { description: Authorization decision recorded }
+        '403': { description: Separate human authority credential required }
+  /api/sessions/{sessionId}/actions/execute:
+    post:
+      summary: Execute a Meta-Harness-cleared action
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200': { description: Action executed }
+        '409': { description: Action blocked }
+  /api/sessions/{sessionId}/decisions/{decisionId}/select:
+    post:
+      summary: Select a Decision Room option under human authority
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - name: decisionId
+          in: path
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/HumanAuthority'
+      responses:
+        '200': { description: Decision selected }
+        '403': { description: Separate human authority credential required }
+  /api/sessions/{sessionId}/audit:
+    get:
+      summary: Verify ledger and canonical-state checkpoint
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200': { description: Audit result }
+  /api/orchestrate:
+    post:
+      summary: Run a planner-worker-verifier governed session
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrchestrationRequest'
+      responses:
+        '200': { description: Governed orchestration result }
+        '400': { description: Contract failure }
+        '429': { description: Budget or rate limit exceeded }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema: { type: string }
+    HumanAuthority:
+      name: x-praxios-human-authorization
+      in: header
+      required: true
+      schema: { type: string, writeOnly: true }
+      description: Separate human-authority credential. Never supplied to model providers.
+  schemas:
+    Evidence:
+      type: object
+      required: [id, summary]
+      properties:
+        id: { type: string }
+        kind: { type: string }
+        summary: { type: string }
+        peerReviewed: { type: boolean }
+        uncertainty: { type: [string, 'null'] }
+        source:
+          type: [object, 'null']
+          properties:
+            title: { type: string }
+            uri: { type: string }
+    Claim:
+      type: object
+      required: [id, text, epistemic]
+      properties:
+        id: { type: string }
+        text: { type: string }
+        epistemic:
+          enum: [OBSERVED, PUBLISHED, DERIVED, INFERRED, HYPOTHESIS, COUNTERFACTUAL, UNKNOWN]
+        evidenceIds:
+          type: array
+          items: { type: string }
+        identifiability:
+          enum: [I0, I1, I2, I3]
+        requiredIdentifiability:
+          enum: [I0, I1, I2, I3]
+    ModelSlot:
+      type: object
+      required: [provider, model]
+      properties:
+        provider: { type: string }
+        model: { type: string }
+        actorId: { type: string }
+    OrchestrationRequest:
+      type: object
+      required: [goal, planner, workers, verifier]
+      properties:
+        goal: { type: string }
+        actor: { type: string }
+        planner: { $ref: '#/components/schemas/ModelSlot' }
+        verifier: { $ref: '#/components/schemas/ModelSlot' }
+        workers:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ModelSlot'
+        budget:
+          type: object
+          properties:
+            maxProviderCalls: { type: integer }
+            maxTasks: { type: integer }
+            maxInputChars: { type: integer }
+            maxOutputChars: { type: integer }
+            maxWallClockMs: { type: integer }
