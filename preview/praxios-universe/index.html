@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PRAXIOS Universe — Vertical Slice</title>
+<meta name="description" content="PRAXIOS + Meta-Harness + EL PUENTE + The Shark + Inverse Reality Lab">
+<style>
+:root{--bg:#07080b;--panel:#0d1117;--line:rgba(255,255,255,.1);--text:#f4f7fa;--muted:#8c96a3;--cyan:#67e8f9;--lime:#a3e635;--amber:#fbbf24;--orange:#fb923c;--red:#fb7185;--blue:#60a5fa}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 16% 8%,rgba(40,130,145,.16),transparent 34rem),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.grid{position:fixed;inset:0;pointer-events:none;opacity:.2;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(#000,transparent 75%)}.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 5vw;border-bottom:1px solid var(--line);background:rgba(7,8,11,.78);backdrop-filter:blur(18px)}.brand{display:flex;gap:10px;align-items:center}.mark{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(103,232,249,.35);color:var(--cyan);font:700 11px ui-monospace,monospace}.brand strong,.brand small{display:block}.brand strong{font-size:13px;letter-spacing:.08em}.brand small{font:500 9px ui-monospace,monospace;color:var(--muted);margin-top:3px}.badge{font:600 9px ui-monospace,monospace;color:#aeb7c2}.badge:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px var(--cyan);margin-right:8px}.hero,.section{max-width:1500px;margin:auto;padding-left:6vw;padding-right:6vw}.hero{padding-top:110px;padding-bottom:70px}.eyebrow,.kicker{color:var(--cyan);font:700 10px ui-monospace,monospace;letter-spacing:.14em}.hero h1{max-width:1000px;margin:20px 0 25px;font-size:clamp(58px,9vw,130px);line-height:.88;letter-spacing:-.06em}.hero h1 span{display:block;color:#808995}.hero p{max-width:740px;color:#a7b0bc;font-size:clamp(17px,2vw,23px);line-height:1.55}.doctrine{display:grid;grid-template-columns:repeat(4,1fr);margin-top:80px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.doctrine span{padding:16px 0;color:#69727f;border-right:1px solid var(--line);font:600 9px ui-monospace,monospace;letter-spacing:.06em}.doctrine span:last-child{text-align:right;border:0;color:#c9d0d8}.section{padding-top:90px;padding-bottom:90px}.head{display:flex;justify-content:space-between;align-items:end;gap:35px;margin-bottom:34px}.head h2{margin:8px 0 0;font-size:clamp(38px,5vw,70px);line-height:1;letter-spacing:-.045em}.head p{max-width:520px;margin:0;color:var(--muted);line-height:1.6}.gene{display:grid;grid-template-columns:360px 1fr;border:1px solid var(--line);background:rgba(255,255,255,.015)}.rail{padding:8px;border-right:1px solid var(--line)}.node{width:100%;display:grid;grid-template-columns:34px 1fr;padding:13px;border:0;border-bottom:1px solid rgba(255,255,255,.045);color:#8b95a2;background:none;text-align:left;cursor:pointer}.node b{font-size:12px}.node small{display:block;margin-top:4px;font:500 9px ui-monospace,monospace}.node .n{grid-row:1/3;color:#515a67;font:500 9px ui-monospace,monospace}.node.active{background:rgba(103,232,249,.08);box-shadow:inset 2px 0 0 var(--cyan);color:#fff}.inspect{min-height:500px;display:grid;align-content:center;padding:70px;position:relative;overflow:hidden}.inspect:after{content:"";position:absolute;width:420px;height:420px;border:1px solid rgba(103,232,249,.12);border-radius:50%;right:-150px;top:-150px;box-shadow:0 0 0 60px rgba(103,232,249,.018),0 0 0 120px rgba(103,232,249,.01)}.inspect h3{margin:10px 0 16px;font-size:clamp(36px,5vw,66px);letter-spacing:-.04em}.inspect p{max-width:680px;color:#a8b1bc;line-height:1.7}.rule{margin-top:35px;max-width:680px;padding:16px 18px;border-left:2px solid var(--cyan);background:rgba(103,232,249,.04);font-size:12px}.form{padding:20px;border:1px solid var(--line);background:#0b0e13}.form label{display:block;color:#69727f;font:600 9px ui-monospace,monospace;letter-spacing:.1em;margin-bottom:10px}.form textarea{width:100%;min-height:105px;resize:vertical;border:0;outline:none;background:none;color:#fff;font-size:18px;line-height:1.55}.formfoot{display:flex;justify-content:space-between;align-items:center;gap:15px;border-top:1px solid var(--line);padding-top:14px}.formfoot span{color:#626b77;font:500 9px ui-monospace,monospace}.formfoot button{border:1px solid var(--cyan);background:var(--cyan);color:#061013;padding:12px 17px;font:700 10px ui-monospace,monospace;cursor:pointer}.pipe{display:grid;grid-template-columns:repeat(8,1fr);margin-top:16px;border:1px solid var(--line)}.stage{min-height:110px;padding:12px;border-right:1px solid var(--line)}.stage i{display:block;width:7px;height:7px;border-radius:50%;margin-bottom:30px}.stage b,.stage small{display:block}.stage b{font:700 10px ui-monospace,monospace}.stage small{margin-top:6px;color:#737c88;font-size:9px}.cyan{background:var(--cyan)}.blue{background:var(--blue)}.amber{background:var(--amber)}.orange{background:var(--orange)}.red{background:var(--red)}.lime{background:var(--lime)}.room{padding:70px 4vw;background:#090b0f;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.roomwrap{max-width:1600px;margin:auto}.roomhead{display:flex;justify-content:space-between;align-items:end;margin-bottom:28px}.roomhead h2{margin:8px 0 0;font-size:clamp(38px,5vw,68px);letter-spacing:-.04em}.mission{font:600 10px ui-monospace,monospace;color:#9ca5b1}.mission b{color:var(--orange);margin-left:10px}.console{display:grid;grid-template-columns:340px 1fr 360px;border:1px solid var(--line);background:#0c0f14}.panel{min-width:0;border-right:1px solid var(--line)}.panel:last-child{border-right:0}.ptitle{display:flex;justify-content:space-between;padding:13px;border-bottom:1px solid var(--line);font:600 9px ui-monospace,monospace;color:#76808d}.claims{padding:7px}.claim{width:100%;display:flex;gap:10px;padding:12px;border:0;border-bottom:1px solid rgba(255,255,255,.045);background:none;color:#9ca6b3;text-align:left;cursor:pointer}.claim:hover,.claim.active{background:rgba(255,255,255,.035)}.claim.active{box-shadow:inset 2px 0 0 var(--cyan)}.claim i{width:8px;height:8px;border-radius:50%;flex:0 0 auto;margin-top:5px}.claim b{display:block;font:700 9px ui-monospace,monospace;color:#d7dee6}.claim p{margin:4px 0 0;font-size:10px;line-height:1.45}.core{min-height:500px;position:relative;display:grid;place-items:center;overflow:hidden}.ring{position:absolute;border:1px solid rgba(103,232,249,.13);border-radius:50%}.ring.r1{width:330px;height:330px}.ring.r2{width:210px;height:210px;border-style:dashed}.center{z-index:2;display:grid;place-content:center;text-align:center;width:110px;height:110px;border-radius:50%;border:1px solid rgba(103,232,249,.35);background:rgba(103,232,249,.05);font:700 10px ui-monospace,monospace;color:var(--cyan)}.sat{position:absolute;z-index:2;display:grid;place-content:center;text-align:center;width:80px;height:80px;border:1px solid var(--line);border-radius:50%;background:#0d1117;font:600 9px ui-monospace,monospace}.s1{transform:translate(-205px,0)}.s2{transform:translate(0,-205px)}.s3{transform:translate(205px,0);border-color:rgba(251,113,133,.25)}.s4{transform:translate(0,205px);border-color:rgba(163,230,53,.25)}.inspectclaim{padding:18px}.state{display:flex;align-items:center;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line)}.state i{width:9px;height:9px;border-radius:50%}.state span{display:block;color:#69727f;font:500 8px ui-monospace,monospace}.state b{font:700 11px ui-monospace,monospace}.inspectclaim>p{color:#b4bdc7;font-size:12px;line-height:1.55}.debt{margin-top:18px;padding:12px;border-left:2px solid var(--amber);background:rgba(251,191,36,.045)}.debt span{display:block;color:#737c88;font:600 8px ui-monospace,monospace;margin-bottom:6px}.debt p{margin:0;color:#9da6b2;font-size:10px;line-height:1.5}.trace{margin-top:12px;border:1px solid var(--line);background:#0c0f14}.event{display:grid;grid-template-columns:70px 115px 1fr auto;gap:12px;align-items:center;min-height:42px;padding:0 13px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px}.event time{color:#5f6874;font-family:ui-monospace,monospace}.event b{font:600 9px ui-monospace,monospace}.event span{font:600 8px ui-monospace,monospace;color:var(--orange)}.inverse{display:grid;grid-template-columns:.7fr 1.3fr;border:1px solid var(--line)}.obs{padding:40px;border-right:1px solid var(--line)}.obs h3{font-size:34px;margin:8px 0 24px}.stack{display:grid;gap:7px}.stack span{padding:10px;border:1px solid var(--line);color:#77818d;font:500 9px ui-monospace,monospace}.cands{padding:24px}.cand{margin:18px 0}.candtop{display:grid;grid-template-columns:50px 1fr auto;gap:10px;font-size:11px}.candtop b{color:var(--cyan);font-family:ui-monospace,monospace}.candtop em{font-style:normal;color:#737c88;font:600 9px ui-monospace,monospace}.bar{height:4px;background:rgba(255,255,255,.05);margin-top:9px}.bar span{display:block;height:100%;background:linear-gradient(90deg,#56616d,var(--cyan))}.footer{padding:28px 5vw;border-top:1px solid var(--line);color:#626b77;font-size:10px}
+@media(max-width:1000px){.gene,.inverse{grid-template-columns:1fr}.rail,.obs{border-right:0;border-bottom:1px solid var(--line)}.console{grid-template-columns:1fr 1fr}.console .panel:last-child{grid-column:1/-1;border-top:1px solid var(--line)}.pipe{grid-template-columns:repeat(4,1fr)}}@media(max-width:700px){.head,.roomhead{display:block}.doctrine{grid-template-columns:1fr 1fr}.console{grid-template-columns:1fr}.console .panel{border-right:0;border-bottom:1px solid var(--line)}.console .panel:last-child{grid-column:auto}.pipe{grid-template-columns:1fr 1fr}.inspect{padding:35px}.event{grid-template-columns:52px 88px 1fr}.event span{grid-column:3}.formfoot{align-items:stretch;flex-direction:column}.formfoot button{width:100%}}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<header class="top">
+  <div class="brand"><span class="mark">PX</span><div><strong>PRAXIOS</strong><small>UNIVERSE / META-HARNESS</small></div></div>
+  <div class="badge">GITHUB PAGES · INTERACTIVE PREVIEW</div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">EL PUENTE → META-HARNESS → PRAXIOS → HUMAN AUTHORITY</div>
+  <h1>El laboratorio alrededor<span> del sueño.</span></h1>
+  <p>Una superficie visible para separar imaginación de autoridad, conservar evidencia, atacar claims y devolver la decisión final al humano.</p>
+  <div class="doctrine"><span>REALITY OVER NARRATIVE</span><span>EVIDENCE OVER CONFIDENCE</span><span>PROCESS OVER ANSWERS</span><span>HUMAN AUTHORITY</span></div>
+</section>
+
+<section class="section">
+  <div class="head"><div><div class="kicker">01 / ORIGIN</div><h2>Genealogía ejecutable</h2></div><p>Selecciona una capa. El preview conserva la genealogía y evita presentar PRAXIOS y Meta-Harness como productos aislados.</p></div>
+  <div class="gene">
+    <div class="rail" id="rail"></div>
+    <div class="inspect"><div class="kicker" id="role"></div><h3 id="title"></h3><p id="body"></p><div class="rule"><b>INHERITANCE RULE</b><br>La capa superior no puede reclamar más autoridad que la evidencia heredada.</div></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="head"><div><div class="kicker">02 / LIVE DEMO</div><h2>Cross the Bridge</h2></div><p>La interacción es deliberadamente estructural: no finge evidencia científica ni convierte texto de usuario en validación.</p></div>
+  <form class="form" id="bridgeForm">
+    <label for="statement">AFIRMACIÓN O MISIÓN</label>
+    <textarea id="statement" maxlength="600">La alteración hidrotermal observada podría ser compatible con un sistema mineralizado, pero no autoriza por sí sola una conclusión causal.</textarea>
+    <div class="formfoot"><span id="count">0/600 · STATIC PREVIEW</span><button>CROSS THE BRIDGE →</button></div>
+  </form>
+  <div class="pipe">
+    <div class="stage"><i class="amber"></i><b>DREAM</b><small>Generar sin autoridad</small></div>
+    <div class="stage"><i class="blue"></i><b>DECOMPOSE</b><small>Claims atómicos</small></div>
+    <div class="stage"><i class="orange"></i><b>INSTRUMENT</b><small>Tocar el Afuera</small></div>
+    <div class="stage"><i class="orange"></i><b>CUSTOMS</b><small>Control de transferencia</small></div>
+    <div class="stage"><i class="blue"></i><b>SKEPTIC</b><small>Alternativa rival</small></div>
+    <div class="stage"><i class="amber"></i><b>METAMATH</b><small>Formalizar cuando aplica</small></div>
+    <div class="stage"><i class="red"></i><b>SHARK</b><small>Ataque adversarial</small></div>
+    <div class="stage"><i class="orange"></i><b>STOP</b><small>Autoridad de salida</small></div>
+  </div>
+</section>
+
+<section class="room">
+  <div class="roomwrap">
+    <div class="roomhead"><div><div class="kicker">03 / EXECUTION SURFACE</div><h2>Control & Decision Room</h2></div><div class="mission">MISSION <span id="missionId">PX-DEMO</span><b>REVIEW</b></div></div>
+    <div class="console">
+      <aside class="panel"><div class="ptitle"><span>CLAIMS</span><span>4</span></div><div class="claims" id="claims"></div></aside>
+      <section class="panel"><div class="ptitle"><span>EXECUTION GRAPH</span><span>STATE OUTSIDE LLM</span></div><div class="core"><div class="ring r1"></div><div class="ring r2"></div><div class="center" id="coreId">PX-DEMO</div><div class="sat s1">DREAMER</div><div class="sat s2">TOOLS</div><div class="sat s3">SHARK</div><div class="sat s4">HUMAN</div></div></section>
+      <aside><div class="ptitle"><span>INSPECTOR</span><span id="claimId">C-001</span></div><div class="inspectclaim"><div class="state"><i class="amber" id="stateDot"></i><div><span>EPISTEMIC STATE</span><b id="stateLabel">CONJECTURE</b></div></div><p id="claimText"></p><div class="debt"><span>OPEN DEBT</span><p id="debtText"></p></div></div></aside>
+    </div>
+    <div class="trace"><div class="ptitle"><span>LIVE TRACE / EVENT LEDGER</span><span>APPEND-ONLY VIEW</span></div><div id="trace"></div></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="head"><div><div class="kicker">04 / RESEARCH DOMAIN</div><h2>Inverse Reality Lab</h2></div><p>El laboratorio reduce espacios de historias compatibles con restricciones. Las barras son visualización conceptual, no probabilidades científicas.</p></div>
+  <div class="inverse"><div class="obs"><div class="kicker">OBSERVED REALITY</div><h3>Constraint space</h3><div class="stack"><span>GEOMETRY</span><span>STRUCTURE</span><span>MATERIALS</span><span>CHRONOLOGY</span><span>MEASUREMENTS</span></div></div><div class="cands" id="candidates"></div></div>
+</section>
+
+<footer class="footer">PRAXIOS Universe · Deep Analytica · Static GitHub Pages preview. La implementación full-stack vive en la misma rama bajo <code>/praxios-universe</code>; este preview no sustituye el runtime PRAXIOS real.</footer>
+
+<script>
+const nodes=[
+["00","Súper Prompt Euler","Método cognitivo","Nombrar, observar, demoler, conjeturar, verificar, unificar, conservar proceso y terminar en la frontera."],
+["01","χ · La Característica","Invariantes heredables","Leyes que sobreviven cuando sistemas crean sistemas: observación, conservación, audacia, verificación, variedad, poder mínimo, contestabilidad, Afuera y alto."],
+["02","EL PUENTE","Doctrina epistemológica","No se cura al soñador. Se construye el laboratorio alrededor del sueño. Imaginación y autoridad quedan separadas."],
+["03","Familia de Harnesses","Instrumentos de crítica","Newton, Gauss, Ramanujan, Poincaré, Einstein y Feynman agregan experimento discriminante, error instrumental, deuda, autopsia y refutación."],
+["04","Harness Matemático","Formalización","Estados epistemológicos, operadores, transferencia de dominio, profundidad refutativa y reglas de promoción."],
+["05","EL ENGRANAJE","Máquina ejecutable","La doctrina empieza a convertirse en software, tests, medición y artefactos reproducibles."],
+["06","THE SHARK","Operador adversarial","No ayuda ni felicita: intenta destruir claims, recomputa, desafía instrumentos, busca deuda y clasifica lo que sobrevive."],
+["07","META-HARNESS","Assurance plane","Controla qué información tiene derecho a ascender: claim, evidence, provenance, uncertainty, contradiction, risk, policy y authorization."],
+["08","PRAXIOS OS","Execution plane","Mantiene misión, estado, workflow, agentes, herramientas, checkpoints, recuperación, acciones y outcomes fuera del LLM."],
+["09","CONTROL & DECISION ROOM","Autoridad humana","Superficie para inspeccionar evidencia, lineage, gates, escenarios, decisiones, acciones y resultados."]
+];
+const rail=document.getElementById("rail"),title=document.getElementById("title"),role=document.getElementById("role"),body=document.getElementById("body");
+function selectNode(i){[...rail.children].forEach((e,n)=>e.classList.toggle("active",n===i));role.textContent=nodes[i][2];title.textContent=nodes[i][1];body.textContent=nodes[i][3]}
+nodes.forEach((n,i)=>{const b=document.createElement("button");b.className="node";b.innerHTML='<span class="n">'+n[0]+'</span><b>'+n[1]+'</b><small>'+n[2]+'</small>';b.onclick=()=>selectNode(i);rail.appendChild(b)});selectNode(2);
+
+const statement=document.getElementById("statement"),count=document.getElementById("count"),claimsEl=document.getElementById("claims"),claimText=document.getElementById("claimText"),debtText=document.getElementById("debtText"),claimId=document.getElementById("claimId"),stateLabel=document.getElementById("stateLabel"),stateDot=document.getElementById("stateDot"),traceEl=document.getElementById("trace"),missionId=document.getElementById("missionId"),coreId=document.getElementById("coreId");
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).toUpperCase().padStart(8,"0")}
+function buildRun(text){return{mission:"PX-"+hash(text).slice(0,6),claims:[
+{id:"C-001",state:"CONJECTURE",color:"amber",text:text,debt:"La entrada del usuario es una proposición, no evidencia independiente."},
+{id:"C-002",state:"CORROBORATED",color:"blue",text:"La misión debe descomponerse en claims verificables antes de adquirir autoridad.",debt:"Regla estructural del preview; falta conexión al runtime canónico."},
+{id:"C-003",state:"REVIEW",color:"orange",text:"Ninguna promoción causal o factual queda autorizada con la evidencia disponible en esta demo.",debt:"Requiere Afuera: fuente, instrumento, test o medición realmente independiente."},
+{id:"C-004",state:"REVIEW",color:"orange",text:"La salida permanece retenida para revisión humana y no debe presentarse como hecho verificado.",debt:"Stop Gate activo hasta evidencia suficiente y trazable."}
+],trace:[
+["00:00.2","Mission","Entrada aceptada y normalizada.","EVENT"],["00:00.5","Dreamer","Registró la proposición sin promoverla.","CONJECTURE"],["00:00.9","Decomposer","Generó claims estructurales para revisión.","EVENT"],["00:01.2","Instrumentist","No existe un Afuera real conectado en este preview.","REVIEW"],["00:01.6","CustomsGate","Bloqueó promociones de dominio no sustentadas.","REVIEW"],["00:02.0","Shark","Atacó independencia, provenance y posibilidad de refutación.","MORDIDO"],["00:02.4","StopGate","Retuvo emisión factual y escaló a humano.","REVIEW"]
+]}}
+let run=buildRun(statement.value),selected=0;
+function render(){missionId.textContent=run.mission;coreId.textContent=run.mission;claimsEl.innerHTML="";run.claims.forEach((c,i)=>{const b=document.createElement("button");b.className="claim"+(i===selected?" active":"");b.innerHTML='<i class="'+c.color+'"></i><div><b>'+c.id+'</b><p>'+c.text+'</p></div>';b.onclick=()=>{selected=i;render()};claimsEl.appendChild(b)});const c=run.claims[selected];claimId.textContent=c.id;stateLabel.textContent=c.state;stateDot.className=c.color;claimText.textContent=c.text;debtText.textContent=c.debt;traceEl.innerHTML=run.trace.map(e=>'<div class="event"><time>'+e[0]+'</time><b>'+e[1]+'</b><p>'+e[2]+'</p><span>'+e[3]+'</span></div>').join("")}
+statement.oninput=()=>count.textContent=statement.value.length+"/600 · STATIC PREVIEW";
+document.getElementById("bridgeForm").onsubmit=e=>{e.preventDefault();if(statement.value.trim().length<12)return;run=buildRun(statement.value.trim());selected=0;render();document.querySelector(".room").scrollIntoView({behavior:"smooth"})};
+count.textContent=statement.value.length+"/600 · STATIC PREVIEW";render();
+
+const candidates=[["H1","Historia candidata A",18,"DEAD"],["H2","Historia candidata B",61,"MORDIDO"],["H3","Historia candidata C",84,"SURVIVES"],["H4","Historia candidata D",31,"DEAD"]];
+document.getElementById("candidates").innerHTML=candidates.map(c=>'<div class="cand"><div class="candtop"><b>'+c[0]+'</b><span>'+c[1]+'</span><em>'+c[3]+'</em></div><div class="bar"><span style="width:'+c[2]+'%"></span></div></div>').join("");
+</script>
+</body>
+</html>
