@@ -1,0 +1,63 @@
+name: Validate PRAXIOS Web OS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/praxios-universe-webos-v1
+      - feat/praxios-webos-v1
+    paths:
+      - "src/app/praxios/**"
+      - "src/app/praxios-universe/**"
+      - "src/app/api/praxios-runtime/**"
+      - "src/app/api/praxios-universe/**"
+      - "src/app/globals.css"
+      - "src/app/layout.tsx"
+      - "next.config.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - "open-next.config.ts"
+      - "wrangler.praxios-universe.jsonc"
+      - ".github/workflows/praxios-universe-preview.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Install build adapter required by repository config
+        run: npm install --no-save @opennextjs/cloudflare@latest wrangler@latest
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: PRAXIOS fixture lifecycle tests
+        run: npx vitest run src/app/praxios/lib/fixture.test.ts
+
+      - name: Next production build
+        run: npm run build
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          echo "### PRAXIOS Web OS validation" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Branch: $GITHUB_REF_NAME" >> "$GITHUB_STEP_SUMMARY"
+          echo "Route: /praxios" >> "$GITHUB_STEP_SUMMARY"
+          echo "Runtime gateway: /api/praxios-runtime/[...path]" >> "$GITHUB_STEP_SUMMARY"
+          echo "Checks: TypeScript + fixture lifecycle tests + production build" >> "$GITHUB_STEP_SUMMARY"
+          echo "Hosting deploy intentionally not coupled to this validation workflow." >> "$GITHUB_STEP_SUMMARY"
