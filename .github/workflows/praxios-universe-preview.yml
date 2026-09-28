@@ -33,8 +33,11 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install
+      - name: Install app dependencies
         run: npm ci
+
+      - name: Install build adapter required by repository config
+        run: npm install --no-save @opennextjs/cloudflare@latest wrangler@latest
 
       - name: TypeScript
         run: npx tsc --noEmit
@@ -50,12 +53,8 @@ jobs:
             echo "enabled=true" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Cloudflare credentials are absent. Validation will pass; Worker deployment is skipped."
+            echo "::notice::Cloudflare credentials are absent. Code validation passes independently; Worker deployment is skipped."
           fi
-
-      - name: Install Cloudflare adapter
-        if: steps.cloudflare.outputs.enabled == 'true'
-        run: npm install --no-save @opennextjs/cloudflare@latest wrangler@latest
 
       - name: Build for Cloudflare Workers
         if: steps.cloudflare.outputs.enabled == 'true'
@@ -79,6 +78,7 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Branch: feat/praxios-universe-webos-v1" >> "$GITHUB_STEP_SUMMARY"
           echo "Full-stack route: /praxios-universe" >> "$GITHUB_STEP_SUMMARY"
+          echo "Static preview: preview/praxios-universe/index.html" >> "$GITHUB_STEP_SUMMARY"
           echo "Cloudflare deploy enabled: ${{ steps.cloudflare.outputs.enabled }}" >> "$GITHUB_STEP_SUMMARY"
           if [ -f /tmp/praxios-deploy.log ]; then
             URL=$(grep -Eo 'https://[^ ]+\.workers\.dev' /tmp/praxios-deploy.log | tail -1 || true)
