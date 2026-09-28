@@ -1,12 +1,15 @@
-name: Validate and optionally deploy PRAXIOS Universe
+name: Validate PRAXIOS Web OS
 
 on:
   workflow_dispatch:
   push:
     branches:
       - feat/praxios-universe-webos-v1
+      - feat/praxios-webos-v1
     paths:
+      - "src/app/praxios/**"
       - "src/app/praxios-universe/**"
+      - "src/app/api/praxios-runtime/**"
       - "src/app/api/praxios-universe/**"
       - "src/app/globals.css"
       - "src/app/layout.tsx"
@@ -18,11 +21,10 @@ on:
       - ".github/workflows/praxios-universe-preview.yml"
 
 jobs:
-  validate-and-deploy:
+  validate:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,45 +44,13 @@ jobs:
       - name: TypeScript
         run: npx tsc --noEmit
 
-      - name: Detect Cloudflare credentials
-        id: cloudflare
-        shell: bash
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Cloudflare credentials are absent. Code validation passes independently; Worker deployment is skipped."
-          fi
-
-      - name: Build for Cloudflare Workers
-        if: steps.cloudflare.outputs.enabled == 'true'
-        run: npx opennextjs-cloudflare build
-
-      - name: Deploy isolated preview worker
-        if: steps.cloudflare.outputs.enabled == 'true'
-        id: deploy
-        shell: bash
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          npx wrangler deploy --config wrangler.praxios-universe.jsonc 2>&1 | tee /tmp/praxios-deploy.log
-
       - name: Summary
         if: always()
         shell: bash
         run: |
-          echo "### PRAXIOS Universe" >> "$GITHUB_STEP_SUMMARY"
+          echo "### PRAXIOS Web OS validation" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Branch: feat/praxios-universe-webos-v1" >> "$GITHUB_STEP_SUMMARY"
-          echo "Full-stack route: /praxios-universe" >> "$GITHUB_STEP_SUMMARY"
-          echo "Static preview: preview/praxios-universe/index.html" >> "$GITHUB_STEP_SUMMARY"
-          echo "Cloudflare deploy enabled: ${{ steps.cloudflare.outputs.enabled }}" >> "$GITHUB_STEP_SUMMARY"
-          if [ -f /tmp/praxios-deploy.log ]; then
-            URL=$(grep -Eo 'https://[^ ]+\.workers\.dev' /tmp/praxios-deploy.log | tail -1 || true)
-            echo "Worker URL: ${URL:-see Wrangler output}" >> "$GITHUB_STEP_SUMMARY"
-          fi
+          echo "Branch: $GITHUB_REF_NAME" >> "$GITHUB_STEP_SUMMARY"
+          echo "Route: /praxios" >> "$GITHUB_STEP_SUMMARY"
+          echo "Runtime gateway: /api/praxios-runtime/[...path]" >> "$GITHUB_STEP_SUMMARY"
+          echo "Hosting deploy intentionally not coupled to this validation workflow." >> "$GITHUB_STEP_SUMMARY"
