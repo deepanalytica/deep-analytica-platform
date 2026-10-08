@@ -1,0 +1,51 @@
+name: Deep Living OS — CI and Pages
+on:
+  push:
+    branches: [main, feat/deep-living-os]
+    paths: ['products/deep-living-os/**', '.github/workflows/deep-living-os.yml']
+  pull_request:
+    paths: ['products/deep-living-os/**', '.github/workflows/deep-living-os.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: deep-living-os-pages
+  cancel-in-progress: false
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: products/deep-living-os
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Unit tests
+        run: npm test
+      - name: Typecheck and build
+        run: npm run build
+        env:
+          VITE_BASE_PATH: /deep-analytica-platform/
+          VITE_SUPABASE_URL: ${{ vars.DL_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.DL_SUPABASE_ANON_KEY }}
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: products/deep-living-os/dist
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
