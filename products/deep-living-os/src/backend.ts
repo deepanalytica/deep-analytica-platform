@@ -74,3 +74,10 @@ export async function addParticipant(dealId:string,userId:string,relation:'propi
  const {error}=await db.from('deal_participants').insert({deal_id:dealId,user_id:userId,relation});
  if(error)throw error;
 }
+
+export async function provisionOrganization(name:string):Promise<string>{
+ if(!db)throw new Error('Configura primero el backend');
+ const {data,error}=await db.rpc('provision_organization',{p_name:name});
+ if(error)throw error;
+ return String(data);
+}
