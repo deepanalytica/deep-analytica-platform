@@ -45,3 +45,11 @@ No están implementadas integraciones con Conservadores, bancos, portales inmobi
 4. Definir backups, recuperación, retención, soporte, observabilidad y respuesta a incidentes.
 5. Conectar datasets sólo con autorización y controlar calidad, vigencia y costo.
 6. Abrir cobros únicamente tras comprobar licencias, alcance de informes y facturación.
+
+## Navegación de demostración
+
+- Ejecutar `npm run dev` sin variables: se abre Deep Living Pro con datos ficticios que no persisten.
+- Abrir `http://localhost:5173/?public=1` para conocer la experiencia pública de **Deep Living Intelligence**.
+- El botón **Vista pública** del centro de mando permite alternar entre ambas experiencias.
+- Con Supabase configurado, el acceso público aparece antes de la autenticación; **Deep Living Pro** exige enlace de correo y permisos de organización.
+- La página pública muestra planes *propuestos*, sin pago habilitado, y un cuestionario de cobertura que no consulta fuentes ni conserva entradas. No constituye informe real.
