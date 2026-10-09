@@ -53,3 +53,10 @@ No están implementadas integraciones con Conservadores, bancos, portales inmobi
 - El botón **Vista pública** del centro de mando permite alternar entre ambas experiencias.
 - Con Supabase configurado, el acceso público aparece antes de la autenticación; **Deep Living Pro** exige enlace de correo y permisos de organización.
 - La página pública muestra planes *propuestos*, sin pago habilitado, y un cuestionario de cobertura que no consulta fuentes ni conserva entradas. No constituye informe real.
+
+## Sistema de diseño y despliegue independiente
+
+- Tokens y estilo: [src/tokens.css](src/tokens.css) y [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
+- Publicación sin reemplazar Deep Mining: `.github/workflows/deep-living-cloudflare.yml` crea/actualiza un proyecto Cloudflare Pages aislado si el token tiene permisos; exige que `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` estén definidos.
+- GitHub Actions verifica HTTP y título del sitio tras publicar. Si faltan permisos, la ejecución falla explícitamente y conserva el build descargable.
+- Los accesos del cliente y profesional requieren Supabase configurado y migraciones revisadas; no presentar la demo como servicio operativo.
