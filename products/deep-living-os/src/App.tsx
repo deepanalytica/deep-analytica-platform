@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useMemo,useState,type FormEvent,type ReactNode} from 'react';
-import {Activity,ArrowRight,ArrowUpRight,BadgeCheck,BookOpen,Building2,Check,CheckCircle2,ChevronRight,ClipboardCheck,Clock3,Compass,Download,FileCheck2,FileSearch,FileText,FolderClosed,GitBranch,Globe2,Home,LayoutDashboard,LockKeyhole,LogOut,MapPin,Menu,Network,Plus,Receipt,RefreshCw,Search,ShieldAlert,ShieldCheck,SlidersHorizontal,Upload,UsersRound,Wallet,X,type LucideIcon} from 'lucide-react';
+import {Activity,ArrowRight,ArrowUpRight,BookOpen,Building2,Check,ChevronRight,Clock3,Compass,Download,FileCheck2,FileText,FolderClosed,GitBranch,Globe2,Home,LayoutDashboard,LockKeyhole,LogOut,MapPin,Menu,Network,Plus,Receipt,RefreshCw,Search,ShieldAlert,ShieldCheck,Upload,UsersRound,Wallet,X,type LucideIcon} from 'lucide-react';
 import {STAGES,commission,matchDemand,mayAdvance,parseNeed,pesos,priorities,type Deal,type Demand,type DealEvent,type Property,type Task} from './core';
 import {demoDeals,demoDemands,demoEvents,demoProperties,demoTasks} from './demo';
 import {addRow,advance,configured,db,loadWorkspace,sendMagicLink,taskDone,uploadDocument,type Workspace} from './backend';
@@ -226,5 +226,5 @@ export default function App(){
   </form></div></div>}
  </div>;
 }
-function Field({label,name,type='text',required=false,min,step,defaultValue}:{label:string;name:string;type?:string;required?:boolean;min?:string;step?:string;defaultValue?:string|number}){return <label className="field-label">{label}<input name={name} type={type} required={required} min={min} step={step} defaultValue={defaultValue}/></label>}
+function Field({label,name,type='text',required=false,min,max,step,defaultValue}:{label:string;name:string;type?:string;required?:boolean;min?:string;max?:string;step?:string;defaultValue?:string|number}){return <label className="field-label">{label}<input name={name} type={type} required={required} min={min} max={max} step={step} defaultValue={defaultValue}/></label>}
 function SelectField({name,label,options,defaultValue}:{name:string;label:string;options:string[];defaultValue?:string}){return <label className="field-label">{label}<select name={name} defaultValue={defaultValue}>{options.map(o=><option value={o} key={o}>{o||'Sin preferencia'}</option>)}</select></label>}
