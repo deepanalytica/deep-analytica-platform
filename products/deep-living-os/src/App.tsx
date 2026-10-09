@@ -36,7 +36,7 @@ function StageBar({stage}:{stage:number}){return <div className="stage-bars" ari
 function PrintReport({property,title}:{property?:Property;title:string}){return <article className="print-report"><h2>{title}</h2><p>Documento preliminar de orientación. No es tasación, estudio jurídico ni certificación técnica.</p>{property?<><h3>{property.title}</h3><dl><dt>Ubicación declarada</dt><dd>{property.address}, {property.commune}</dd><dt>Precio indicado en cartera</dt><dd>{pesos(property.price)}</dd><dt>Características declaradas</dt><dd>{property.bedrooms} dormitorios · {property.bathrooms} baños · {property.parking?'Con':'Sin'} estacionamiento</dd></dl></>:<p>No se seleccionó una propiedad.</p>}<h3>Limitaciones y próximos pasos</h3><p>Los atributos provienen de datos aportados al inventario. No se han consultado mapas oficiales, certificados, tránsito, delincuencia, amenazas, licencias comerciales ni antecedentes registrales. Antes de decidir, confirmar identidad del inmueble, uso permitido, costos totales y documentación pertinente.</p><p>Deep Living | Informe de demostración | Fecha de emisión: {new Date().toLocaleDateString('es-CL')}</p></article>}
 export default function App(){
  const [tab,setTab]=useState<Tab>('command');
- const [publicView,setPublicView]=useState(configured || new URLSearchParams(window.location.search).get('public')==='1');
+ const [publicView,setPublicView]=useState(new URLSearchParams(window.location.search).get('app')!=='1');
  const [workspace,setWorkspace]=useState<Workspace>(demoInitial);
  const [user,setUser]=useState<string|null>(null);
  const [userId,setUserId]=useState('');
