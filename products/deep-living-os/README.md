@@ -9,7 +9,7 @@ Command (alertas, tareas, anticipación), Match (necesidades y coincidencias), I
 ## Instalación
 
 1. `cd products/deep-living-os && npm install && npm run check && npm run dev`.
-2. Crear proyecto Supabase; ejecutar `supabase/migrations/20261008_init.sql` y luego `supabase/migrations/20261008_hardening.sql` y finalmente `supabase/migrations/20261008_fee_privacy.sql` (en orden); habilitar autenticación por enlace de correo y definir URLs de redirección.
+2. Crear proyecto Supabase; ejecutar `supabase/migrations/20261008_init.sql` y luego `supabase/migrations/20261008_hardening.sql` y finalmente `supabase/migrations/20261008_fee_privacy.sql` y finalmente `supabase/migrations/20261008_onboarding.sql` (en orden); habilitar autenticación por enlace de correo y definir URLs de redirección.
 3. Crear organización y membresía, utilizando el UUID de `auth.users` después de autenticar:
    `insert into public.organizations(name) values ('Mi corredora') returning id;`
    `insert into public.memberships(org_id,user_id,role) values ('ORG_UUID','AUTH_USER_UUID','admin');`
@@ -39,7 +39,7 @@ No están implementadas integraciones con Conservadores, bancos, portales inmobi
 
 ## Checklist antes de permitir uso real
 
-1. Aprovisionar Supabase y aplicar las tres migraciones; ejecutar las pruebas S-01 a S-17 contra dos organizaciones y roles distintos.
+1. Aprovisionar Supabase y aplicar las cuatro migraciones; ejecutar las pruebas S-01 a S-17 contra dos organizaciones y roles distintos.
 2. Validar los casos con abogados/técnicos y un responsable de privacidad.
 3. Verificar configuración de Pages, dominios, autenticación, URLs de retorno y cabeceras de seguridad.
 4. Definir backups, recuperación, retención, soporte, observabilidad y respuesta a incidentes.
@@ -60,3 +60,16 @@ No están implementadas integraciones con Conservadores, bancos, portales inmobi
 - Publicación sin reemplazar Deep Mining: `.github/workflows/deep-living-cloudflare.yml` crea/actualiza un proyecto Cloudflare Pages aislado si el token tiene permisos; exige que `CLOUDFLARE_API_TOKEN` y `CLOUDFLARE_ACCOUNT_ID` estén definidos.
 - GitHub Actions verifica HTTP y título del sitio tras publicar. Si faltan permisos, la ejecución falla explícitamente y conserva el build descargable.
 - Los accesos del cliente y profesional requieren Supabase configurado y migraciones revisadas; no presentar la demo como servicio operativo.
+
+## Iteración v0.2
+
+- Inicio público por defecto con metodología, formulario preliminar, planes de informe en modo piloto y acceso a Pro.
+- Diseño semántico DLS en `src/tokens.css`, tokens compartidos, manifest/icono PWA, responsive y especificación `docs/DESIGN_SYSTEM.md`.
+- Alta de organizaciones autenticadas mediante RPC (la base requiere las cuatro migraciones en orden).
+- Tareas con responsables visibles, fechas y estados; acceso limitado por operación para propietarios.
+- PreCheck genera un informe JSON versionado y una impresión con estados conocidos, desconocidos y pasos a comprobar; no contiene datos oficiales no consultados.
+- CI publica un artefacto descargable y ejecuta pruebas. Cloudflare Pages se despliega únicamente si hay credenciales de API y permisos de Pages, usando `.github/workflows/deep-living-cloudflare.yml` en proyecto separado.
+
+### Estado de despliegue
+
+Las pruebas automáticas no sustituyen una revisión visual y E2E. La parte pública puede ponerse online como piloto informativo sin backend; para operar con contratos, documentos y clientes reales se necesitan: Supabase, migraciones, pruebas RLS/E2E, privacidad, fuentes licenciadas y verificación de despliegue. La publicación por Cloudflare fallará de forma explícita si faltan `CLOUDFLARE_API_TOKEN` o `CLOUDFLARE_ACCOUNT_ID`.
