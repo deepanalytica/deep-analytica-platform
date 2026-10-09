@@ -3,6 +3,7 @@ import {Activity,ArrowRight,ArrowUpRight,BookOpen,Building2,Check,ChevronRight,C
 import {STAGES,commission,matchDemand,mayAdvance,parseNeed,pesos,priorities,type Deal,type Demand,type DealEvent,type Property,type Task} from './core';
 import {demoDeals,demoDemands,demoEvents,demoProperties,demoTasks} from './demo';
 import {makePrecheck} from './evidence';
+import PublicSite from './PublicSite';
 import {addParticipant,addRow,advance,configured,db,loadWorkspace,sendMagicLink,taskDone,uploadDocument,type Workspace} from './backend';
 import './styles.css';
 
@@ -35,6 +36,7 @@ function StageBar({stage}:{stage:number}){return <div className="stage-bars" ari
 function PrintReport({property,title}:{property?:Property;title:string}){return <article className="print-report"><h2>{title}</h2><p>Documento preliminar de orientación. No es tasación, estudio jurídico ni certificación técnica.</p>{property?<><h3>{property.title}</h3><dl><dt>Ubicación declarada</dt><dd>{property.address}, {property.commune}</dd><dt>Precio indicado en cartera</dt><dd>{pesos(property.price)}</dd><dt>Características declaradas</dt><dd>{property.bedrooms} dormitorios · {property.bathrooms} baños · {property.parking?'Con':'Sin'} estacionamiento</dd></dl></>:<p>No se seleccionó una propiedad.</p>}<h3>Limitaciones y próximos pasos</h3><p>Los atributos provienen de datos aportados al inventario. No se han consultado mapas oficiales, certificados, tránsito, delincuencia, amenazas, licencias comerciales ni antecedentes registrales. Antes de decidir, confirmar identidad del inmueble, uso permitido, costos totales y documentación pertinente.</p><p>Deep Living | Informe de demostración | Fecha de emisión: {new Date().toLocaleDateString('es-CL')}</p></article>}
 export default function App(){
  const [tab,setTab]=useState<Tab>('command');
+ const [publicView,setPublicView]=useState(configured || new URLSearchParams(window.location.search).get('public')==='1');
  const [workspace,setWorkspace]=useState<Workspace>(demoInitial);
  const [user,setUser]=useState<string|null>(null);
  const [userId,setUserId]=useState('');
@@ -133,6 +135,7 @@ export default function App(){
  const currentTitle=MENU.find(m=>m.key===tab)?.label||'Centro de mando';
  const showForm=(kind:FormKind)=>setFormKind(kind);
 
+ if(publicView)return <PublicSite onEnter={()=>setPublicView(false)}/>;
  if(authLoading)return <div className="center-screen"><div className="brand-symbol">D</div><h2>Preparando Deep Living OS</h2></div>;
  if(configured&&!user)return <main className="login-page"><div className="login-visual"><span className="brand-mark">D<span>.</span></span><span className="eyebrow">DEEP LIVING OS</span><h1>Un mejor negocio empieza con mejores decisiones.</h1><p>Inteligencia territorial, operaciones trazables y un entorno seguro para cada participante.</p></div><form className="login-card" onSubmit={async e=>{e.preventDefault();try{await sendMagicLink(email);setLinkSent(true);}catch(x){notify(x instanceof Error?x.message:'No fue posible enviar el enlace','error');}}}><IconTile icon={LockKeyhole}/><h2>Ingresa a tu espacio</h2><p>Te enviaremos un enlace de acceso al correo registrado.</p><label>Correo electrónico<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="tu@correo.cl"/></label><button className="btn primary" type="submit">Enviar enlace seguro <ArrowRight size={17}/></button>{linkSent&&<p className="inline-success">Revisa tu correo. El acceso dependerá de los permisos asignados.</p>}{notice&&<p className="inline-error">{notice.message}</p>}</form></main>;
 
@@ -145,7 +148,7 @@ export default function App(){
   </aside>
   {navOpen&&<button className="nav-backdrop" aria-label="Cerrar navegación" onClick={()=>setNavOpen(false)}/>}
   <div className="main-area">
-   <header className="topbar"><div className="topbar-left"><button className="hamburger icon-button" aria-label="Abrir navegación" onClick={()=>setNavOpen(true)}><Menu size={22}/></button><span className="breadcrumb">Workspace <ChevronRight size={14}/> <strong>{currentTitle}</strong></span></div><div className="topbar-right"><span className={'mode '+(isDemo?'mode-demo':'mode-live')}>{isDemo?'DEMO SIN PERSISTENCIA':'CONECTADO · ACCESO PRIVADO'}</span>{!isDemo&&<button className="icon-button" title="Actualizar" onClick={()=>void refresh()}><RefreshCw size={17}/></button>}{!isDemo&&<button className="icon-button" title="Cerrar sesión" onClick={()=>void db?.auth.signOut()}><LogOut size={17}/></button>}<span className="user-circle">{isParticipant?'C':'DL'}</span></div></header>
+   <header className="topbar"><div className="topbar-left"><button className="hamburger icon-button" aria-label="Abrir navegación" onClick={()=>setNavOpen(true)}><Menu size={22}/></button><span className="breadcrumb">Workspace <ChevronRight size={14}/> <strong>{currentTitle}</strong></span></div><div className="topbar-right"><button className="topbar-link" onClick={()=>setPublicView(true)}><Globe2 size={15}/> Vista pública</button><span className={'mode '+(isDemo?'mode-demo':'mode-live')}>{isDemo?'DEMO SIN PERSISTENCIA':'CONECTADO · ACCESO PRIVADO'}</span>{!isDemo&&<button className="icon-button" title="Actualizar" onClick={()=>void refresh()}><RefreshCw size={17}/></button>}{!isDemo&&<button className="icon-button" title="Cerrar sesión" onClick={()=>void db?.auth.signOut()}><LogOut size={17}/></button>}<span className="user-circle">{isParticipant?'C':'DL'}</span></div></header>
    <main className="content">
     {notice&&<div role="status" className={'notice '+notice.kind}><span>{notice.message}</span><button aria-label="Cerrar mensaje" onClick={()=>setNotice(null)}><X size={17}/></button></div>}
     {loading&&<p className="subtle">Actualizando datos...</p>}
