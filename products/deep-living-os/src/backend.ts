@@ -20,16 +20,18 @@ export async function loadWorkspace():Promise<Workspace>{
  // A participant without staff membership can only access the client portal (RLS).
  const tableNames=['properties','demands','deals','tasks','deal_events','contacts','fees','documents','exchange_requests','location_studies'] as const;
  const items=await Promise.all(tableNames.map(async name=>{
-  if(!orgId && !['deals','tasks','deal_events','documents','fees'].includes(name))return [];
+  if(!orgId && !['deals','tasks','deal_events','documents'].includes(name))return [];
   const query= db!.from(name).select('*').limit(300);
   const {data,error}=await (orgId?query.eq('org_id',orgId):query);
   if(error)throw new Error(name+': '+error.message);
   return data||[];
  }));
+ let externalFeeSummaries:Fee[]=[];
+ if(!orgId){const {data:feesForOwner,error:feeError}=await db.rpc('get_my_fee_summaries');if(feeError)throw feeError;externalFeeSummaries=(feesForOwner||[]) as Fee[];}
  return {
   membership:membership as Membership|null,properties:items[0] as Property[],demands:items[1] as Demand[],
   deals:items[2] as Deal[],tasks:items[3] as Task[],events:items[4] as DealEvent[],
-  contacts:items[5] as Contact[],fees:items[6] as Fee[],documents:items[7] as Document[],
+  contacts:items[5] as Contact[],fees:orgId?items[6] as Fee[]:externalFeeSummaries,documents:items[7] as Document[],
   exchanges:items[8] as Exchange[],studies:items[9] as Study[]
  };
 }
