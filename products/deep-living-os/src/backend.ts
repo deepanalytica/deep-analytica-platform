@@ -20,7 +20,7 @@ export async function loadWorkspace():Promise<Workspace>{
  // A participant without staff membership can only access the client portal (RLS).
  const tableNames=['properties','demands','deals','tasks','deal_events','contacts','fees','documents','exchange_requests','location_studies'] as const;
  const items=await Promise.all(tableNames.map(async name=>{
-  if(!orgId && !['deals','tasks','deal_events','documents'].includes(name))return [];
+  if(!orgId && !['deals','tasks','deal_events','documents','fees'].includes(name))return [];
   const query= db!.from(name).select('*').limit(300);
   const {data,error}=await (orgId?query.eq('org_id',orgId):query);
   if(error)throw new Error(name+': '+error.message);
@@ -63,4 +63,12 @@ export async function uploadDocument(orgId:string,dealId:string,file:File,title:
  if(uploadError)throw uploadError;
  const {error}=await db.from('documents').insert({org_id:orgId,deal_id:dealId,title,storage_path:path,visibility,uploaded_by:(await db.auth.getUser()).data.user?.id});
  if(error)throw new Error('Se subió un archivo privado, pero no se registró en el expediente: '+error.message);
+}
+
+export async function addParticipant(dealId:string,userId:string,relation:'propietario'|'comprador'){
+ if(!db)throw new Error('Sin backend');
+ const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ if(!uuid.test(userId))throw new Error('Identificador de usuario inválido');
+ const {error}=await db.from('deal_participants').insert({deal_id:dealId,user_id:userId,relation});
+ if(error)throw error;
 }
