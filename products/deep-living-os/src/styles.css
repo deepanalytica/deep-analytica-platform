@@ -9,3 +9,4 @@
 
 .id-panel{display:flex;align-items:flex-start;gap:10px;color:#586b80;background:#ecf3fa;border:1px solid #dce8f6;border-radius:10px;font-size:12px;padding:14px 16px;margin-bottom:19px;overflow-wrap:anywhere}.id-panel svg{flex:none}.id-panel strong{color:#254c85;font-size:11px}
 .coverage{border-top:1px solid #e9edf2;padding-top:16px;margin:18px 0}.coverage>strong,.coverage>span{display:block}.coverage>strong{font-size:13px}.coverage>span{color:#7b8c9d;font-size:11px;margin:7px 0 11px}.coverage-row{display:flex;justify-content:space-between;gap:9px;align-items:center;border-top:1px solid #edf0f5;padding:9px 0;font-size:11px;color:#5d6d80}
+.topbar-link{background:transparent;border:0;display:flex;align-items:center;gap:6px;color:#526f8c;font-size:11px;font-weight:800;white-space:nowrap}.topbar-link:hover{color:#315dcd}@media(max-width:690px){.topbar-link{font-size:0;gap:0}.topbar-link svg{width:19px;height:19px}}
