@@ -1,9 +1,9 @@
 -- Deep Living OS | Commercial terms must not be silently declared agreed.
 -- Apply after onboarding.sql, pending legal review and RLS integration tests.
 alter table public.fees drop constraint if exists fees_state_check;
+update public.fees set state='propuesta' where state='pactada';
 alter table public.fees add constraint fees_state_check
   check (state in ('propuesta','comunicada','confirmada','exigible','pagada','disputada'));
-update public.fees set state='propuesta' where state='pactada';
 alter table public.fees alter column state set default 'propuesta';
 -- Client cannot see agent's unilateral draft as a binding fee.
 create or replace function public.get_my_fee_summaries()
