@@ -1,0 +1,29 @@
+/* Deep Living Design System v1 | Public + Pro | semantic tokens */
+:root {
+  --dl-color-ink:#132c46;
+  --dl-color-body:#34495d;
+  --dl-color-muted:#718397;
+  --dl-color-primary:#315dcd;
+  --dl-color-primary-hover:#244aa7;
+  --dl-color-forest:#16866f;
+  --dl-color-forest-hover:#116b59;
+  --dl-color-canvas:#f5f7fa;
+  --dl-color-panel:#ffffff;
+  --dl-color-outline:#e2e9f0;
+  --dl-color-focus:#84adfc;
+  --dl-color-success:#16866f;
+  --dl-color-warning:#98651c;
+  --dl-color-error:#b54744;
+  --dl-color-info:#2b5dad;
+  --dl-font-heading:'Manrope','DM Sans',system-ui,sans-serif;
+  --dl-font-body:'DM Sans',system-ui,sans-serif;
+  --dl-radius-sm:6px;
+  --dl-radius-md:9px;
+  --dl-radius-lg:13px;
+  --dl-radius-xl:18px;
+  --dl-space-1:4px;--dl-space-2:8px;--dl-space-3:12px;--dl-space-4:16px;
+  --dl-space-5:20px;--dl-space-6:24px;--dl-space-8:32px;
+  --dl-shadow-card:0 12px 32px rgba(20,40,66,.08);
+  --dl-min-touch:44px;
+  --dl-max-width:1500px;
+}
