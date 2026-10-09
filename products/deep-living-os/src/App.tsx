@@ -23,6 +23,7 @@ const MENU:{key:Tab;label:string;icon:LucideIcon;group:string}[]=[
  {key:'evidence',label:'Fuentes y evidencia',icon:BookOpen,group:'INTELIGENCIA'},
  {key:'finance',label:'Comisiones',icon:Wallet,group:'GESTIÓN'}
 ];
+const liveInitial:Workspace={membership:null,properties:[],demands:[],deals:[],tasks:[],events:[],contacts:[],fees:[],documents:[],exchanges:[],studies:[]};
 const demoInitial:Workspace={membership:{org_id:'demo',role:'admin'},properties:demoProperties,demands:demoDemands,deals:demoDeals,tasks:demoTasks,events:demoEvents,contacts:[{id:'C-1',name:'Cliente de ejemplo',kind:'comprador'}],fees:[{id:'F-1',deal_id:'O-301',rate:2,add_vat:true,due_milestone:'promesa',state:'pactada'}],documents:[],exchanges:[{id:'N-1',partner_name:'Corredor de ejemplo',details:'Solicitud de vivienda de tres dormitorios en Curicó',status:'propuesta'}],studies:[]};
 const uid=()=>typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():'demo-'+Date.now().toString(36);
 const formatDate=(v?:string|null)=>v?new Date(v).toLocaleDateString('es-CL',{day:'2-digit',month:'short',year:'numeric'}):'Sin fecha';
@@ -41,11 +42,12 @@ function PrintReport({report}:{report:ReturnType<typeof buildPrecheckReport>|nul
 export default function App(){
  const [tab,setTab]=useState<Tab>('command');
  const [publicView,setPublicView]=useState(new URLSearchParams(window.location.search).get('app')!=='1');
- const [workspace,setWorkspace]=useState<Workspace>(demoInitial);
+ const [workspace,setWorkspace]=useState<Workspace>(configured?liveInitial:demoInitial);
  const [user,setUser]=useState<string|null>(null);
  const [userId,setUserId]=useState('');
  const [authLoading,setAuthLoading]=useState(configured);
  const [workspaceLoaded,setWorkspaceLoaded]=useState(!configured);
+ const [loadError,setLoadError]=useState('');
  const [orgName,setOrgName]=useState('');
  const [loading,setLoading]=useState(false);
  const [email,setEmail]=useState('');
@@ -78,8 +80,8 @@ export default function App(){
  const notify=(message:string,kind:'ok'|'error'='ok')=>setNotice({message,kind});
  const refresh=useCallback(async()=>{
   if(!configured)return;
-  setLoading(true);
-  try{setWorkspace(await loadWorkspace());}catch(e){notify(e instanceof Error?e.message:'Error al cargar datos','error');}finally{setLoading(false);setWorkspaceLoaded(true);}
+  setLoading(true);setLoadError('');
+  try{setWorkspace(await loadWorkspace());}catch(e){const msg=e instanceof Error?e.message:'Error al cargar datos';setLoadError(msg);notify(msg,'error');}finally{setLoading(false);setWorkspaceLoaded(true);}
  },[]);
  useEffect(()=>{
   if(!db)return;
@@ -146,6 +148,7 @@ export default function App(){
  if(publicView)return <PublicSite onEnter={()=>setPublicView(false)}/>;
  if(authLoading)return <div className="center-screen"><div className="brand-symbol">D</div><h2>Preparando Deep Living OS</h2></div>;
  if(configured&&user&&!workspaceLoaded)return <div className="center-screen"><div className="brand-symbol">D</div><h2>Preparando tu espacio privado</h2></div>;
+ if(configured&&user&&loadError)return <div className="center-screen"><div className="brand-symbol">!</div><h2>No pudimos cargar tu espacio</h2><p className="inline-error">{loadError}</p><button className="btn primary" onClick={()=>void refresh()}>Reintentar conexión</button><button className="btn quiet" onClick={()=>void db?.auth.signOut()}>Cerrar sesión</button></div>;
  if(isUnassigned&&!loading)return <main className="login-page"><div className="login-visual"><span className="brand-mark">D<span>.</span></span><span className="eyebrow">DEEP LIVING PRO</span><h1>Gestiona cada propiedad y cada operación con claridad.</h1><p>Organiza tu corredora, asigna responsables y comparte avances verificables con tus clientes.</p></div><form className="login-card" onSubmit={async e=>{e.preventDefault();try{await provisionOrganization(orgName);await refresh();notify('Tu espacio está preparado.');}catch(x){notify(x instanceof Error?x.message:'No fue posible crear tu corredora','error');}}}><IconTile icon={Building2}/><h2>Prepara tu espacio</h2><p>Si un corredor debe darte acceso a su operación, pídele una invitación. Si eres corredor, crea tu organización.</p><label>Nombre de tu corredora<input required minLength={3} maxLength={90} value={orgName} onChange={e=>setOrgName(e.target.value)} placeholder="Ej. Corretajes del Maule"/></label><button className="btn primary" type="submit">Crear organización <ArrowRight size={17}/></button><p className="fineprint">Esta herramienta está en etapa piloto y no sustituye verificación legal ni revisión de títulos.</p>{notice&&<p className={notice.kind==='error'?'inline-error':'inline-success'}>{notice.message}</p>}<button className="btn quiet" type="button" onClick={()=>void db?.auth.signOut()}>Cerrar sesión</button></form></main>;
  if(configured&&!user)return <main className="login-page"><div className="login-visual"><span className="brand-mark">D<span>.</span></span><span className="eyebrow">DEEP LIVING OS</span><h1>Un mejor negocio empieza con mejores decisiones.</h1><p>Inteligencia territorial, operaciones trazables y un entorno seguro para cada participante.</p></div><form className="login-card" onSubmit={async e=>{e.preventDefault();try{await sendMagicLink(email);setLinkSent(true);}catch(x){notify(x instanceof Error?x.message:'No fue posible enviar el enlace','error');}}}><IconTile icon={LockKeyhole}/><h2>Ingresa a tu espacio</h2><p>Te enviaremos un enlace de acceso al correo registrado.</p><label>Correo electrónico<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="tu@correo.cl"/></label><button className="btn primary" type="submit">Enviar enlace seguro <ArrowRight size={17}/></button>{linkSent&&<p className="inline-success">Revisa tu correo. El acceso dependerá de los permisos asignados.</p>}{notice&&<p className="inline-error">{notice.message}</p>}</form></main>;
 
