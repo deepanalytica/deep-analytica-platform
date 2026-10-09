@@ -55,3 +55,46 @@ jobs:
     steps:
       - uses: actions/deploy-pages@v4
         id: deployment
+
+  sql_security:
+    name: PostgreSQL / RLS regression tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: deep_living_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d deep_living_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 8
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: deep_living_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare PostgreSQL client
+        run: command -v psql || (sudo apt-get update -qq && sudo apt-get install -y postgresql-client)
+      - name: Bootstrap mock Supabase environment
+        run: psql -v ON_ERROR_STOP=1 -f products/deep-living-os/tests/sql/bootstrap.sql
+      - name: Apply all migrations in order
+        run: |
+          set -euo pipefail
+          for file in \
+            products/deep-living-os/supabase/migrations/20261008_init.sql \
+            products/deep-living-os/supabase/migrations/20261008_hardening.sql \
+            products/deep-living-os/supabase/migrations/20261008_fee_privacy.sql \
+            products/deep-living-os/supabase/migrations/20261008_onboarding.sql \
+            products/deep-living-os/supabase/migrations/20261008_fees_draft.sql
+          do
+            psql -v ON_ERROR_STOP=1 -f "$file"
+          done
+      - name: Tenant permissions and transactional gates
+        run: psql -v ON_ERROR_STOP=1 -f products/deep-living-os/tests/sql/security.sql
