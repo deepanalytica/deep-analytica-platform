@@ -12,7 +12,7 @@ export const STAGES: Stage[] = [
 export type Property = { id:string; title:string; address:string; commune:string; sector?:string; price:number; bedrooms:number; bathrooms:number; parking:boolean; area?:number; operation_type:'venta'|'arriendo'; property_type:'casa'|'departamento'|'oficina'|'local'|'terreno'; status:'disponible'|'reservada'|'vendida'|'arrendada'; org_id?:string };
 export type Demand = { id:string; client_name:string; commune:string; budget_max:number; bedrooms_min:number; parking_required:boolean; operation_type:'venta'|'arriendo'; property_type?:string; preferred_sector?:string; status?:string; org_id?:string };
 export type Deal = { id:string; title:string; stage:number; price:number; org_id?:string; property_id?:string|null; updated_at?:string; created_at?:string };
-export type Task = { id:string; title:string; deal_id:string; status:'pendiente'|'hecha'; due_at?:string|null; blocking:boolean; visibility?:'interno'|'cliente'; org_id?:string };
+export type Task = { id:string; title:string; deal_id:string; status:'pendiente'|'hecha'; due_at?:string|null; responsible_label?:string|null; blocking:boolean; visibility?:'interno'|'cliente'; org_id?:string };
 export type DealEvent = { id:string; deal_id:string; summary:string; created_at:string; stage:number; visibility:'interno'|'cliente'; org_id?:string };
 export function normalize(value:string):string {return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();}
 export function parseNeed(text:string):Partial<Demand>{
