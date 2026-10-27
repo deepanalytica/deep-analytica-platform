@@ -1,14 +1,15 @@
 import {useCallback,useEffect,useMemo,useState,type FormEvent,type ReactNode} from 'react';
-import {Activity,ArrowRight,ArrowUpRight,BookOpen,Building2,Check,ChevronRight,Clock3,Compass,Download,FileCheck2,FileText,FolderClosed,GitBranch,Globe2,Home,LayoutDashboard,LockKeyhole,LogOut,MapPin,Menu,Network,Plus,Receipt,RefreshCw,Search,ShieldAlert,ShieldCheck,Upload,UsersRound,Wallet,X,type LucideIcon} from 'lucide-react';
+import {Activity,ArrowRight,ArrowUpRight,BarChart3,BookOpen,Building2,Check,ChevronRight,Clock3,Compass,Download,FileCheck2,FileText,FolderClosed,GitBranch,Globe2,Home,LayoutDashboard,LockKeyhole,LogOut,MapPin,Menu,Network,Plus,Receipt,RefreshCw,Search,ShieldAlert,ShieldCheck,Upload,UsersRound,Wallet,X,type LucideIcon} from 'lucide-react';
 import {STAGES,commission,matchDemand,mayAdvance,parseNeed,pesos,priorities,type Deal,type Demand,type DealEvent,type Property,type Task} from './core';
 import {demoDeals,demoDemands,demoEvents,demoProperties,demoTasks} from './demo';
 import {makePrecheck} from './evidence';
 import {buildPrecheckReport,safeReportFilename} from './reports';
 import PublicSite from './PublicSite';
+import DecisionIntelligence from './DecisionIntelligence';
 import {addParticipant,addRow,advance,configured,db,loadWorkspace,provisionOrganization,sendMagicLink,taskDone,uploadDocument,type Workspace} from './backend';
 import './styles.css';
 
-type Tab='command'|'intelligence'|'match'|'properties'|'deals'|'verify'|'track'|'network'|'finance'|'evidence';
+type Tab='command'|'decision'|'intelligence'|'match'|'properties'|'deals'|'verify'|'track'|'network'|'finance'|'evidence';
 type FormKind='property'|'demand'|'deal'|'task'|'contact'|'exchange'|'fee'|'participant'|null;
 type Notice={kind:'ok'|'error';message:string};
 const MENU:{key:Tab;label:string;icon:LucideIcon;group:string}[]=[
@@ -20,6 +21,7 @@ const MENU:{key:Tab;label:string;icon:LucideIcon;group:string}[]=[
  {key:'properties',label:'Propiedades',icon:Building2,group:'COMERCIAL'},
  {key:'network',label:'Colaboraciones',icon:Network,group:'COMERCIAL'},
  {key:'intelligence',label:'Intelligence',icon:Compass,group:'INTELIGENCIA'},
+ {key:'decision',label:'Decision Intelligence',icon:BarChart3,group:'INTELIGENCIA'},
  {key:'evidence',label:'Fuentes y evidencia',icon:BookOpen,group:'INTELIGENCIA'},
  {key:'finance',label:'Comisiones',icon:Wallet,group:'GESTIÓN'}
 ];
@@ -215,6 +217,8 @@ export default function App(){
      <SectionTitle eyebrow="NEGOCIOS EN COLABORACIÓN" title="Red de corredores" subtitle="Solicitudes y acuerdos registrados. No se comparten automáticamente clientes ni inventario." actions={<button className="btn primary" onClick={()=>showForm('exchange')}><Plus size={16}/>Nueva solicitud</button>}/>
      <div className="network-banner"><Network size={28}/><div><strong>Canjes responsables, relaciones protegidas.</strong><p>Antes de compartir un contacto o un inmueble, acuerden representación, autorización, contacto directo y reparto de honorarios. El módulo actual registra solicitudes privadas: no existe un marketplace nacional conectado.</p></div></div><Box heading="Solicitudes de colaboración">{workspace.exchanges.length?workspace.exchanges.map(e=><div className="match-row" key={e.id}><div><strong>{e.partner_name}</strong><small>{e.details}</small></div><Pill tone="amber">{e.status}</Pill></div>):<Empty title="Aún no hay acuerdos" description="Registra solicitudes con colaboradores de confianza."/>}</Box>
     </>}
+
+    {tab==='decision'&&!isParticipant&&<DecisionIntelligence properties={workspace.properties}/>}
 
     {tab==='intelligence'&&!isParticipant&&<>
      <SectionTitle eyebrow="INTELIGENCIA PARA DECIDIR" title="¿Esta ubicación me conviene?" subtitle="Compara alternativas con las características que conocemos. Los datos no disponibles se declaran, nunca se inventan."/>
