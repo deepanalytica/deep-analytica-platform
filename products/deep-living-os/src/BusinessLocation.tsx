@@ -1,5 +1,5 @@
 import {useMemo,useState} from 'react';
-import {Activity,AlertTriangle,ArrowRight,BarChart3,Building2,CheckCircle2,ChevronDown,Compass,MapPin,Plus,ShieldAlert,SlidersHorizontal,Trash2,Wallet} from 'lucide-react';
+import {Activity,AlertTriangle,ArrowRight,BarChart3,Building2,CheckCircle2,ChevronDown,Compass,MapPin,Plus,ShieldAlert,SlidersHorizontal,Trash2} from 'lucide-react';
 import {EXAMPLE_CASE,PROFILES,evaluateBusinessCase,validateBusinessCase,type BusinessCase,type LocationCandidate} from './location-fit-engine';
 import './business-location.css';
 const clp=(n:number|null)=>n===null?'Sin cálculo':new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(n);
