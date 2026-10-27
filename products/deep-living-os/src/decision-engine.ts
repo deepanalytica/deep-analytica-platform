@@ -119,21 +119,19 @@ function onePath(id:ActionId,a:Assumptions,rand:()=>number):number{
  const finalValue=value*(1-a.saleFeeRate);
  return total+finalValue/Math.pow(1+a.discountRate,sellYear);
 }
-export function runDecisionModel(base:Assumptions,scenarioId:ScenarioId,seed=20261027,iterations=1600):DecisionResult{
+export type DecisionProgress={
+ phase:'validating'|'filtering'|'simulating'|'aggregating'|'complete';
+ processed:number;total:number;actionId?:ActionId;actionDone:number;actionTotal:number;message:string;
+};
+function setup(base:Assumptions,scenarioId:ScenarioId,iterations:number){
  const scenario=SCENARIOS.find(s=>s.id===scenarioId)||SCENARIOS[0];
  const a={...base,...scenario.changes};
  const errors=validateInputs(a);
  if(errors.length)throw new Error(errors.join(' '));
  if(!Number.isInteger(iterations)||iterations<100||iterations>30000)throw new Error('Iteraciones fuera de rango.');
- const samples=new Map<ActionId,number[]>();
- for(const action of ACTIONS)samples.set(action.id,[]);
- // Las rutas de cada acción se reproducen con idéntico seed (no son sin embargo trayectorias pareadas).
- for(const action of ACTIONS){
-  if(blocked(action.id,a))continue;
-  const actionRand=rng((seed+Math.imul(ACTIONS.indexOf(action)+1,2654435761))>>>0);
-  const series=samples.get(action.id)!;
-  for(let k=0;k<iterations;k++)series.push(onePath(action.id,a,actionRand));
- }
+ return {a,scenario};
+}
+function summarize(a:Assumptions,scenario:Scenario,seed:number,iterations:number,samples:Map<ActionId,number[]>):DecisionResult{
  const sellBaseline=moneyNow(a);
  const results:ActionResult[]=ACTIONS.map(action=>{
   const reason=blocked(action.id,a),values=samples.get(action.id)!.sort((x,y)=>x-y);
@@ -151,6 +149,61 @@ export function runDecisionModel(base:Assumptions,scenarioId:ScenarioId,seed=202
   'Revisión jurídica y técnica obligatoria antes de operar.'];
  if(scenario.family==='familia')warnings.push('No modela valores subjetivos, otras viviendas ni mudanza: no recomendar solo por valor presente.');
  return {assumptions:a,scenario,seed,iterations,actions:results,top:eligible[0],warnings,tree:decisionTree(a,scenario)};
+}
+export function runDecisionModel(base:Assumptions,scenarioId:ScenarioId,seed=20261027,iterations=1600):DecisionResult{
+ const {a,scenario}=setup(base,scenarioId,iterations);
+ const samples=new Map<ActionId,number[]>(ACTIONS.map(action=>[action.id,[]]));
+ for(const [index,action] of ACTIONS.entries()){
+  if(blocked(action.id,a))continue;
+  const actionRand=rng((seed+Math.imul(index+1,2654435761))>>>0);
+  const series=samples.get(action.id)!;
+  for(let k=0;k<iterations;k++)series.push(onePath(action.id,a,actionRand));
+ }
+ return summarize(a,scenario,seed,iterations,samples);
+}
+/**
+ * Ejecuta rutas reales por lotes; el progreso emitido corresponde a cálculos terminados.
+ * Comparte algoritmo, semilla y agregador con el cálculo sincrónico.
+ * Yield entre lotes mantiene la interfaz operativa y permite cancelación por AbortController.
+ */
+export async function runDecisionModelProgressive(
+ base:Assumptions,scenarioId:ScenarioId,seed:number,iterations:number,
+ onProgress:(progress:DecisionProgress)=>void,signal?:AbortSignal
+):Promise<DecisionResult>{
+ const assertActive=()=>{if(signal?.aborted)throw new Error('SIMULATION_ABORTED');};
+ assertActive();
+ onProgress({phase:'validating',processed:0,total:0,actionDone:0,actionTotal:0,message:'Validando los parámetros del caso'});
+ const {a,scenario}=setup(base,scenarioId,iterations);
+ assertActive();
+ const allowed=ACTIONS.filter(action=>!blocked(action.id,a));
+ const total=allowed.length*iterations;
+ const samples=new Map<ActionId,number[]>(ACTIONS.map(action=>[action.id,[]]));
+ let processed=0,actionDone=0;
+ onProgress({phase:'filtering',processed,total,actionDone,actionTotal:allowed.length,message:'Comprobando restricciones jurídicas y de habitabilidad'});
+ await new Promise<void>(resolve=>setTimeout(resolve,0));
+ assertActive();
+ for(const [index,action] of ACTIONS.entries()){
+  if(blocked(action.id,a))continue;
+  const random=rng((seed+Math.imul(index+1,2654435761))>>>0);
+  const series=samples.get(action.id)!;
+  for(let k=0;k<iterations;k+=160){
+   assertActive();
+   const limit=Math.min(iterations,k+160);
+   for(let j=k;j<limit;j++)series.push(onePath(action.id,a,random));
+   processed+=limit-k;
+   onProgress({phase:'simulating',processed,total,actionId:action.id,actionDone,actionTotal:allowed.length,
+    message:'Calculando '+action.label.toLowerCase()+' · '+limit.toLocaleString('es-CL')+'/'+iterations.toLocaleString('es-CL')});
+   await new Promise<void>(resolve=>setTimeout(resolve,0));
+  }
+  actionDone++;
+  onProgress({phase:'simulating',processed,total,actionId:action.id,actionDone,actionTotal:allowed.length,message:'Alternativa completada: '+action.label});
+ }
+ assertActive();
+ onProgress({phase:'aggregating',processed,total,actionDone,actionTotal:allowed.length,message:'Calculando media, percentiles y pérdidas extremas'});
+ const result=summarize(a,scenario,seed,iterations,samples);
+ assertActive();
+ onProgress({phase:'complete',processed,total,actionDone,actionTotal:allowed.length,message:'Comparación finalizada · resultados disponibles'});
+ return result;
 }
 export function pesosCLP(value:number):string{return Number.isFinite(value)?new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',maximumFractionDigits:0}).format(Math.round(value)):'—';}
 export function millionCLP(value:number):string{return (value/1000000).toLocaleString('es-CL',{maximumFractionDigits:1,minimumFractionDigits:1})+' MM';}
