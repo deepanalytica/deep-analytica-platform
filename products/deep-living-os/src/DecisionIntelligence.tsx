@@ -1,7 +1,7 @@
 import {useMemo,useState} from 'react';
-import {Activity,AlertTriangle,ArrowRight,BarChart3,BookOpen,CheckCircle2,ChevronDown,Download,GitBranch,Info,Layers3,RefreshCcw,ShieldAlert,SlidersHorizontal,TrendingUp} from 'lucide-react';
+import {Activity,AlertTriangle,ArrowRight,BarChart3,BookOpen,CheckCircle2,ChevronDown,Download,GitBranch,Info,Layers3,RefreshCcw,ShieldAlert,SlidersHorizontal} from 'lucide-react';
 import type {Property} from './core';
-import {ACTIONS,DEFAULT_ASSUMPTIONS,SCENARIOS,runDecisionModel,millionCLP,pesosCLP,type Assumptions,type ScenarioId} from './decision-engine';
+import {ACTIONS,DEFAULT_ASSUMPTIONS,SCENARIOS,runDecisionModel,millionCLP,type Assumptions,type ScenarioId} from './decision-engine';
 import './decision-intelligence.css';
 
 type Props={properties:Property[]};
