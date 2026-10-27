@@ -6,6 +6,7 @@ import {makePrecheck} from './evidence';
 import {buildPrecheckReport,safeReportFilename} from './reports';
 import PublicSite from './PublicSite';
 import DecisionIntelligence from './DecisionIntelligence';
+import OperationPulse,{type OperationFlow} from './OperationPulse';
 import {addParticipant,addRow,advance,configured,db,loadWorkspace,provisionOrganization,sendMagicLink,taskDone,uploadDocument,type Workspace} from './backend';
 import './styles.css';
 
@@ -55,6 +56,7 @@ export default function App(){
  const [email,setEmail]=useState('');
  const [linkSent,setLinkSent]=useState(false);
  const [notice,setNotice]=useState<Notice|null>(null);
+ const [operationFlow,setOperationFlow]=useState<OperationFlow|null>(null);
  const [navOpen,setNavOpen]=useState(false);
  const [formKind,setFormKind]=useState<FormKind>(null);
  const [selectedDeal,setSelectedDeal]=useState('');
@@ -80,10 +82,19 @@ export default function App(){
  const precheck=useMemo(()=>chosenProperty?makePrecheck(chosenProperty,purpose,Number(budget)):null,[chosenProperty,purpose,budget]);
  const report=useMemo(()=>chosenProperty?buildPrecheckReport(chosenProperty,purpose,Number(budget)):null,[chosenProperty,purpose,budget]);
  const notify=(message:string,kind:'ok'|'error'='ok')=>setNotice({message,kind});
- const refresh=useCallback(async()=>{
+ const refresh=useCallback(async(silent=false)=>{
   if(!configured)return;
+  if(!silent)setOperationFlow({kind:'consulta',phase:'preparando',title:'Preparando consulta'});
   setLoading(true);setLoadError('');
-  try{setWorkspace(await loadWorkspace());}catch(e){const msg=e instanceof Error?e.message:'Error al cargar datos';setLoadError(msg);notify(msg,'error');}finally{setLoading(false);setWorkspaceLoaded(true);}
+  try{
+   if(!silent)setOperationFlow({kind:'consulta',phase:'ejecutando',title:'Consultando datos del espacio'});
+   setWorkspace(await loadWorkspace());
+   if(!silent)setOperationFlow({kind:'consulta',phase:'completado',title:'Espacio sincronizado'});
+  }catch(e){
+   const msg=e instanceof Error?e.message:'Error al cargar datos';
+   setLoadError(msg);notify(msg,'error');
+   if(!silent)setOperationFlow({kind:'consulta',phase:'error',title:'Fallo de sincronización'});
+  }finally{setLoading(false);setWorkspaceLoaded(true);}
  },[]);
  useEffect(()=>{
   if(!db)return;
@@ -96,7 +107,27 @@ export default function App(){
  useEffect(()=>{if(isParticipant&&tab!=='track')setTab('track');},[isParticipant,tab]);
  const nav=(to:Tab)=>{setTab(to);setNavOpen(false);window.scrollTo({top:0,behavior:'smooth'});};
  const mutation=async(action:()=>Promise<void>,demoAction:()=>void)=>{
-  try{if(isDemo){demoAction();notify('Cambio de demostración: se perderá al recargar.');}else{await action();await refresh();notify('Cambio guardado y confirmado.');}setFormKind(null);}catch(e){notify(e instanceof Error?e.message:'No fue posible completar la acción','error');}
+  const kind=isDemo?'demo':'escritura';
+  const title=formKind?'Actualizando '+formKind:'Actualizando operación';
+  setOperationFlow({kind,phase:'preparando',title});
+  try{
+   setOperationFlow({kind,phase:'ejecutando',title});
+   if(isDemo){
+    demoAction();
+    setOperationFlow({kind:'demo',phase:'completado',title:'Ejemplo actualizado (temporal)'});
+    notify('Cambio de demostración: se perderá al recargar.');
+   }else{
+    await action();
+    setOperationFlow({kind:'escritura',phase:'sincronizando',title:'Sincronizando registros'});
+    await refresh(true);
+    setOperationFlow({kind:'escritura',phase:'completado',title:'Registro confirmado'});
+    notify('Cambio guardado y confirmado.');
+   }
+   setFormKind(null);
+  }catch(e){
+   setOperationFlow({kind,phase:'error',title:'No se confirmó la actualización'});
+   notify(e instanceof Error?e.message:'No fue posible completar la acción','error');
+  }
  };
  const add=async(e:FormEvent<HTMLFormElement>)=>{
   e.preventDefault();if(!formKind)return;
@@ -163,7 +194,7 @@ export default function App(){
   </aside>
   {navOpen&&<button className="nav-backdrop" aria-label="Cerrar navegación" onClick={()=>setNavOpen(false)}/>}
   <div className="main-area">
-   <header className="topbar"><div className="topbar-left"><button className="hamburger icon-button" aria-label="Abrir navegación" onClick={()=>setNavOpen(true)}><Menu size={22}/></button><span className="breadcrumb">Workspace <ChevronRight size={14}/> <strong>{currentTitle}</strong></span></div><div className="topbar-right"><button className="topbar-link" onClick={()=>setPublicView(true)}><Globe2 size={15}/> Vista pública</button><span className={'mode '+(isDemo?'mode-demo':'mode-live')}>{isDemo?'DEMO SIN PERSISTENCIA':'CONECTADO · ACCESO PRIVADO'}</span>{!isDemo&&<button className="icon-button" title="Actualizar" onClick={()=>void refresh()}><RefreshCw size={17}/></button>}{!isDemo&&<button className="icon-button" title="Cerrar sesión" onClick={()=>void db?.auth.signOut()}><LogOut size={17}/></button>}<span className="user-circle">{isParticipant?'C':'DL'}</span></div></header>
+   <header className="topbar"><div className="topbar-left"><button className="hamburger icon-button" aria-label="Abrir navegación" onClick={()=>setNavOpen(true)}><Menu size={22}/></button><span className="breadcrumb">Workspace <ChevronRight size={14}/> <strong>{currentTitle}</strong></span></div><div className="topbar-right"><OperationPulse flow={operationFlow}/><button className="topbar-link" onClick={()=>setPublicView(true)}><Globe2 size={15}/> Vista pública</button><span className={'mode '+(isDemo?'mode-demo':'mode-live')}>{isDemo?'DEMO SIN PERSISTENCIA':'CONECTADO · ACCESO PRIVADO'}</span>{!isDemo&&<button className="icon-button" title="Actualizar" onClick={()=>void refresh()}><RefreshCw size={17}/></button>}{!isDemo&&<button className="icon-button" title="Cerrar sesión" onClick={()=>void db?.auth.signOut()}><LogOut size={17}/></button>}<span className="user-circle">{isParticipant?'C':'DL'}</span></div></header>
    <main className="content">
     {notice&&<div role="status" className={'notice '+notice.kind}><span>{notice.message}</span><button aria-label="Cerrar mensaje" onClick={()=>setNotice(null)}><X size={17}/></button></div>}
     {loading&&<p className="subtle">Actualizando datos...</p>}
