@@ -95,7 +95,6 @@ function onePath(id:ActionId,a:Assumptions,rand:()=>number):number{
  const renovate=id==='renovate_sell'||id==='renovate_rent';
  const mitigation=id==='mitigate_rent';
  const rent=id==='rent'||id==='renovate_rent'||id==='mitigate_rent';
- const holding=id==='hold';
  const sellYear=id==='renovate_sell'?1:id==='sell_later'?Math.min(2,a.years):a.years;
  let value=a.price*(renovate?(1+a.renovationPriceLift):1);
  let total=-(renovate?a.renovationCost:0)-(mitigation?a.mitigationCost:0);
@@ -109,7 +108,7 @@ function onePath(id:ActionId,a:Assumptions,rand:()=>number):number{
     loss=value*severity*(mitigation?a.mitigationDamageFactor:1);
     value=Math.max(0,value-loss);
     const indemnity=loss*a.insuranceCoverage;
-    total+=(indemnity-loss)/(1+a.discountRate)**y;
+    total+=indemnity/(1+a.discountRate)**y;
     value*=1-bound(a.territorialPriceShock,0,1);
   }
   const income=rent?rRent*12*Math.pow(1+a.annualRentGrowth,y-1)*a.occupancy*(1-a.managementRate):0;
@@ -117,7 +116,7 @@ function onePath(id:ActionId,a:Assumptions,rand:()=>number):number{
   total+=(income-expenses)/Math.pow(1+a.discountRate,y);
   if(id==='renovate_sell'&&y===1)break;
  }
- const finalValue=holding?value:value*(1-a.saleFeeRate);
+ const finalValue=value*(1-a.saleFeeRate);
  return total+finalValue/Math.pow(1+a.discountRate,sellYear);
 }
 export function runDecisionModel(base:Assumptions,scenarioId:ScenarioId,seed=20261027,iterations=1600):DecisionResult{
@@ -126,7 +125,7 @@ export function runDecisionModel(base:Assumptions,scenarioId:ScenarioId,seed=202
  const errors=validateInputs(a);
  if(errors.length)throw new Error(errors.join(' '));
  if(!Number.isInteger(iterations)||iterations<100||iterations>30000)throw new Error('Iteraciones fuera de rango.');
- const samples=new Map<ActionId,number[]>();const prng=rng(seed);
+ const samples=new Map<ActionId,number[]>();
  for(const action of ACTIONS)samples.set(action.id,[]);
  // Las rutas de cada acción se reproducen con idéntico seed (no son sin embargo trayectorias pareadas).
  for(const action of ACTIONS){
@@ -135,7 +134,6 @@ export function runDecisionModel(base:Assumptions,scenarioId:ScenarioId,seed=202
   const series=samples.get(action.id)!;
   for(let k=0;k<iterations;k++)series.push(onePath(action.id,a,actionRand));
  }
- void prng;
  const sellBaseline=moneyNow(a);
  const results:ActionResult[]=ACTIONS.map(action=>{
   const reason=blocked(action.id,a),values=samples.get(action.id)!.sort((x,y)=>x-y);
