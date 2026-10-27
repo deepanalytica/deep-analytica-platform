@@ -27,3 +27,30 @@
   --dl-min-touch:44px;
   --dl-max-width:1500px;
 }
+
+/* DLS v2: semantic operational and evidence aliases (light theme foundation).
+   These colors signal actual state; evidence confidence is a separate dimension. */
+:root {
+ --dl-surface-primary:var(--dl-color-panel);
+ --dl-surface-secondary:var(--dl-color-canvas);
+ --dl-text-primary:var(--dl-color-ink);
+ --dl-text-secondary:var(--dl-color-muted);
+ --dl-border-default:var(--dl-color-outline);
+ --dl-state-pending:#758698;
+ --dl-state-running:var(--dl-color-info);
+ --dl-state-complete:var(--dl-color-success);
+ --dl-state-review:var(--dl-color-warning);
+ --dl-state-blocked:var(--dl-color-error);
+ --dl-state-error:var(--dl-color-error);
+ --dl-state-cancelled:#758698;
+ --dl-evidence-declared:#526d83;
+ --dl-evidence-observed:#137b65;
+ --dl-evidence-estimated:#946d31;
+ --dl-evidence-unavailable:#748394;
+ --dl-motion-quick:120ms;
+ --dl-motion-standard:220ms;
+ --dl-ease-out:cubic-bezier(.2,.7,.3,1);
+}
+@media(prefers-reduced-motion:reduce) {
+ :root { --dl-motion-quick:0ms;--dl-motion-standard:0ms; }
+}
