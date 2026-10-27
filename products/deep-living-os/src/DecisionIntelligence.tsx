@@ -1,7 +1,7 @@
-import {useMemo,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {Activity,AlertTriangle,ArrowRight,BarChart3,BookOpen,CheckCircle2,ChevronDown,Download,GitBranch,Info,Layers3,RefreshCcw,ShieldAlert,SlidersHorizontal} from 'lucide-react';
 import type {Property} from './core';
-import {ACTIONS,DEFAULT_ASSUMPTIONS,SCENARIOS,runDecisionModel,millionCLP,type Assumptions,type ScenarioId} from './decision-engine';
+import {ACTIONS,DEFAULT_ASSUMPTIONS,SCENARIOS,runDecisionModelProgressive,millionCLP,type Assumptions,type DecisionProgress,type DecisionResult,type ScenarioId} from './decision-engine';
 import './decision-intelligence.css';
 
 type Props={properties:Property[]};
@@ -29,6 +29,24 @@ function downloadJson(data:unknown,filename:string){
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});
  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
+
+const PHASES=[
+ {key:'validating',label:'Entrada',sub:'Datos y límites'},
+ {key:'filtering',label:'Reglas',sub:'Restricciones'},
+ {key:'simulating',label:'Monte Carlo',sub:'Trayectorias'},
+ {key:'aggregating',label:'Métricas',sub:'Percentiles'},
+ {key:'complete',label:'Informe',sub:'Comparación'}
+] as const;
+function ProcessFlow({progress,error}:{progress:DecisionProgress;error:boolean}){
+ const index=PHASES.findIndex(p=>p.key===progress.phase);
+ return <div className="di-process-flow" aria-label="Etapas del proceso de cálculo">
+  {PHASES.map((p,i)=><div className={'di-flow-node '+(error&&i===index?'failed':i<index?'done':i===index?'active':'pending')} key={p.key}>
+   <span className="di-flow-dot">{i<index?<CheckCircle2 size={14}/>:String(i+1).padStart(2,'0')}</span>
+   <strong>{p.label}</strong><small>{p.sub}</small>
+   {i<PHASES.length-1&&<span className="di-flow-connector" aria-hidden="true"/>}
+  </div>)}
+ </div>;
+}
 export default function DecisionIntelligence({properties}:Props){
  const eligible=properties.filter(p=>p.operation_type==='venta'&&p.price>0);
  const [propertyId,setPropertyId]=useState('manual');
@@ -41,8 +59,31 @@ export default function DecisionIntelligence({properties}:Props){
  const [seed,setSeed]=useState(20261027);
  const activeProperty=eligible.find(p=>p.id===propertyId);
  const current=SCENARIOS.find(s=>s.id===scenario)!;
- const analysis=useMemo(()=>{try{return {data:runDecisionModel(base,scenario,seed,iterations),error:''};}catch(e){return {data:null,error:e instanceof Error?e.message:'Parámetros no válidos'};}},[base,scenario,seed,iterations]);
+ const [analysis,setAnalysis]=useState<{data:DecisionResult|null;error:string}>({data:null,error:''});
+ const [progress,setProgress]=useState<DecisionProgress>({phase:'validating',processed:0,total:0,actionDone:0,actionTotal:0,message:'Preparando escenario'});
+ const [history,setHistory]=useState<string[]>([]);
+ const [rerun,setRerun]=useState(0);
+ useEffect(()=>{
+  const abort=new AbortController();
+  setAnalysis({data:null,error:''});
+  setHistory([]);
+  setProgress({phase:'validating',processed:0,total:0,actionDone:0,actionTotal:0,message:'Preparando nuevo análisis'});
+  const timer=setTimeout(()=>{
+   let lastEvent='';
+   void runDecisionModelProgressive(base,scenario,seed,iterations,p=>{
+    if(abort.signal.aborted)return;
+    setProgress(p);
+    const event=p.phase==='simulating'?p.phase+':'+p.actionId+':'+p.actionDone:p.phase;
+    if(lastEvent!==event){lastEvent=event;setHistory(prev=>[p.message,...prev].slice(0,7));}
+   },abort.signal).then(data=>{if(!abort.signal.aborted)setAnalysis({data,error:''});}).catch(e=>{
+    if(!abort.signal.aborted)setAnalysis({data:null,error:e instanceof Error?e.message:'Error de simulación'});
+   });
+  },130);
+  return()=>{clearTimeout(timer);abort.abort();};
+ },[base,scenario,seed,iterations,rerun]);
  const data=analysis.data;
+ const working=!data&&!analysis.error;
+ const percentage=progress.total>0?Math.round(progress.processed/progress.total*100):0;
  const ranked=data?data.actions.filter(a=>a.allowed).sort((a,b)=>b[metric]-a[metric]):[];
  const max=Math.max(...ranked.map(x=>Math.max(0,x[metric])),1);
  const blocked=data?data.actions.filter(a=>!a.allowed):[];
@@ -71,7 +112,7 @@ export default function DecisionIntelligence({properties}:Props){
      </label>
      <div className="di-context"><small>{STEP_NAMES[current.family]}</small><strong>{current.summary}</strong><p>{current.note}</p></div>
      <div className="di-divider"/>
-     <div className="di-subheading"><span>Supuestos base</span><button onClick={()=>setBase(s=>({...DEFAULT_ASSUMPTIONS,price:activeProperty?.price||DEFAULT_ASSUMPTIONS.price}))}><RefreshCcw size={13}/> Restablecer</button></div>
+     <div className="di-subheading"><span>Supuestos base</span><button onClick={()=>setBase(()=>({...DEFAULT_ASSUMPTIONS,price:activeProperty?.price||DEFAULT_ASSUMPTIONS.price}))}><RefreshCcw size={13}/> Restablecer</button></div>
      {params.slice(0,7).map(p=><label className="di-field" key={p.key}>{p.label}<span className="di-number"><input inputMode="decimal" type="number" min={pctKeys.has(p.key)?p.min*100:p.min} max={pctKeys.has(p.key)?p.max*100:p.max} step={pctKeys.has(p.key)?p.step*100:p.step} value={formatInput(p.key,base[p.key] as number)} onChange={e=>change(p.key,readInput(p.key,Number(e.target.value)) as never)}/><span>{pctKeys.has(p.key)?'%':p.unit}</span></span></label>)}
      <button className="di-expand" aria-expanded={advanced} onClick={()=>setAdvanced(v=>!v)}><span>Riesgos, seguros y obras</span><ChevronDown className={advanced?'rotate':''} size={16}/></button>
      {advanced&&<>
@@ -87,6 +128,12 @@ export default function DecisionIntelligence({properties}:Props){
 
     <div className="di-results">
      <div className="di-panel-head"><span><Activity size={17}/> SIMULACIÓN DE ALTERNATIVAS</span><span className="di-index">02 / 03</span></div>
+     <div className="di-controlbar"><span className={'di-runtime-indicator '+(working?'running':analysis.error?'failed':'finished')}><span className="di-light"/>{analysis.error?'ANÁLISIS DETENIDO':working?'MOTOR EN EJECUCIÓN':'ANÁLISIS COMPLETADO'}</span><button type="button" className="di-rerun" onClick={()=>setRerun(v=>v+1)}><RefreshCcw size={14}/> Recalcular</button></div>
+     <ProcessFlow progress={progress} error={Boolean(analysis.error)}/>
+     <div className="di-progress-area"><div className="di-progress-text"><strong>{progress.message}</strong><span>{progress.processed.toLocaleString('es-CL')} / {progress.total.toLocaleString('es-CL')} rutas · {percentage}%</span></div><div className="di-progress-track" role="progressbar" aria-label="Rutas efectivamente calculadas" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percentage}><span style={{width:percentage+'%'}}/></div></div>
+     <div className="di-live-actions"><div className="di-live-heading"><Activity size={15}/> TRAZA DE EJECUCIÓN <span>{progress.actionDone}/{progress.actionTotal} alternativas calculadas</span></div><div className="di-live-grid">{ACTIONS.map(a=>{const done=progress.phase==='complete';const active=working&&progress.actionId===a.id&&progress.phase==='simulating';const blockedNow=progress.phase!=='validating'&&((!base.legalCleared&&a.id!=='hold')||(!base.habitable&&['rent','renovate_rent','mitigate_rent'].includes(a.id))||((base.liquidityUrgent||current.changes.liquidityUrgent)&&a.id!=='sell_now')||(scenario==='sin_titulos'&&a.id!=='hold'));
+       return <span key={a.id} className={'di-action-node '+(blockedNow?'blocked':active?'active':done?'complete':'waiting')}><i className="di-action-led"/>{a.label}</span>;
+      })}</div><div className="di-event-list" aria-label="Actividad reciente">{history.slice(0,4).map((item,i)=><span key={i}>{item}</span>)}</div></div>
      {analysis.error&&<div className="di-alert error" role="alert">{analysis.error}</div>}
      {data&&<>
       <div className="di-alert"><AlertTriangle size={17}/><span><strong>Entorno de laboratorio.</strong> Resultados hipotéticos, sin conexión a fuentes territoriales, mercados o registros. No constituyen recomendaciones de inversión.</span></div>
