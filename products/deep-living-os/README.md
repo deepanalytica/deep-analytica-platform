@@ -2,6 +2,10 @@
 
 Sistema independiente de inteligencia y operaciones inmobiliarias para Chile, mantenido en `products/deep-living-os/`. No modifica la aplicación raíz del repositorio.
 
+## Nuevo: Decision Intelligence (laboratorio)
+
+El menú **INTELIGENCIA → Decision Intelligence** integra escenarios de vida/territorio, árboles de decisión, comparaciones Monte Carlo reproducibles, métricas de valor presente y pérdidas extremas (P10/CVaR) y exportación JSON local. Usa precios declarados del inventario de venta; **no** consulta fuentes ni realiza tasaciones, transacciones o predicciones territoriales reales. Sin persistencia ni captación automática de personas. Véase [contrato y límites](docs/DECISION_INTELLIGENCE.md).
+
 ## Módulos
 
 Command (alertas, tareas, anticipación), Match (necesidades y coincidencias), Inventario/Prospect, Operations (8 etapas y auditoría), Verify (lista de comprobación jurídica), Track (portal de participantes), Network (registro de solicitudes de canje), Location (evaluación de ubicaciones manual y transparente), Finance (comisiones).
