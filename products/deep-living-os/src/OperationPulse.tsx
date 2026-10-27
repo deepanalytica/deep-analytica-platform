@@ -1,4 +1,4 @@
-import {Activity,Check,ChevronDown,LoaderCircle,ShieldAlert} from 'lucide-react';
+import {Activity,Check,ChevronDown,LoaderCircle} from 'lucide-react';
 import './operation-pulse.css';
 
 export type OperationFlow={
