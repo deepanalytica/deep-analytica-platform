@@ -94,6 +94,7 @@ export default function App(){
    const msg=e instanceof Error?e.message:'Error al cargar datos';
    setLoadError(msg);notify(msg,'error');
    if(!silent)setOperationFlow({kind:'consulta',phase:'error',title:'Fallo de sincronización'});
+   if(silent)throw e;
   }finally{setLoading(false);setWorkspaceLoaded(true);}
  },[]);
  useEffect(()=>{
