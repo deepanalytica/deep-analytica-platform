@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {DEFAULT_ASSUMPTIONS,SCENARIOS,runDecisionModel,validateInputs,type Assumptions} from '../src/decision-engine';
+import {DEFAULT_ASSUMPTIONS,SCENARIOS,runDecisionModel,runDecisionModelProgressive,validateInputs,type Assumptions} from '../src/decision-engine';
 
 const model=(updates:Partial<Assumptions>={},scenario='base')=>runDecisionModel({...DEFAULT_ASSUMPTIONS,...updates},scenario as typeof SCENARIOS[number]['id'],20261027,500);
 const get=(data:ReturnType<typeof model>,id:string)=>data.actions.find(a=>a.id===id)!;
@@ -62,4 +62,33 @@ test('el modelo solo expone acciones y escenarios conocidos',()=>{
  assert.equal(model().actions.length,7);
  assert.equal(SCENARIOS.length,14);
  assert.throws(()=>runDecisionModel(DEFAULT_ASSUMPTIONS,'base',123,5),/Iteraciones/);
+});
+
+test('la ejecución progresiva refleja rutas realmente procesadas y reproduce el algoritmo',async()=>{
+ const progress:{phase:string;processed:number;total:number;actionDone:number}[]=[];
+ const result=await runDecisionModelProgressive(DEFAULT_ASSUMPTIONS,'base',20261027,500,p=>{
+  progress.push({phase:p.phase,processed:p.processed,total:p.total,actionDone:p.actionDone});
+ });
+ const sync=runDecisionModel(DEFAULT_ASSUMPTIONS,'base',20261027,500);
+ assert.deepEqual(result.actions,sync.actions);
+ assert.equal(progress[0]?.phase,'validating');
+ assert.equal(progress.at(-1)?.phase,'complete');
+ assert.equal(progress.at(-1)?.processed,progress.at(-1)?.total);
+ assert.ok(progress.some(p=>p.phase==='simulating'&&p.processed>0&&p.processed<p.total));
+ for(let i=1;i<progress.length;i++)assert.ok(progress[i].processed>=progress[i-1].processed);
+});
+test('una ejecución cancelada no permite continuar el cómputo',async()=>{
+ const abort=new AbortController();
+ let count=0;
+ await assert.rejects(runDecisionModelProgressive(DEFAULT_ASSUMPTIONS,'base',20261027,5000,p=>{
+  if(p.phase==='simulating'&&++count===1)abort.abort();
+ },abort.signal),/SIMULATION_ABORTED/);
+});
+test('la barra refleja acciones elegibles y no contabiliza restricciones como trayectorias',async()=>{
+ const values:number[]=[];
+ const result=await runDecisionModelProgressive({...DEFAULT_ASSUMPTIONS,liquidityUrgent:true},'base',20261027,500,p=>{
+  if(p.phase==='simulating')values.push(p.processed);
+ });
+ assert.equal(result.actions.filter(a=>a.allowed).length,1);
+ assert.equal(values.at(-1),500);
 });
