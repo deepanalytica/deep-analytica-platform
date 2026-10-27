@@ -1,5 +1,14 @@
 # Deep Living OS
 
+## Nuevo · Business Location Intelligence (laboratorio local)
+
+En **Deep Living Pro → INTELIGENCIA → Ubicación para negocios** ya existe un workspace responsive para comparar locales de **cualquier comuna de Chile**. Incluye perfiles por actividad (psicología, odontología, contabilidad, restaurante, comercio u otra), hasta seis alternativas, costes, margen unitario, punto de equilibrio, sensibilidad y bloqueos de presupuesto y uso declarado incompatible.
+
+**Límite:** utiliza valores aportados o ficticios y calcula solo la parte financiera; no dispone de geocodificación, tránsito, estacionamientos, competencia, normativa, valores comerciales ni datos territoriales oficiales. No hay persistencia de casos, pagos ni certificaciones. **No utilizar como dictamen profesional.**
+
+Instrucciones de continuidad para otros agentes: [AGENTS.md](AGENTS.md) · [Estado](docs/SOFTWARE_STATUS.md) · [Estrategia y escalera de valor](docs/PRODUCT_STRATEGY_V2.md) · [Siguiente sesión](docs/NEXT_AGENT.md).
+
+
 Sistema independiente de inteligencia y operaciones inmobiliarias para Chile, mantenido en `products/deep-living-os/`. No modifica la aplicación raíz del repositorio.
 
 ## Nuevo: Decision Intelligence (laboratorio)
