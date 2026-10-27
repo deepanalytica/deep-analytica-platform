@@ -6,11 +6,12 @@ import {makePrecheck} from './evidence';
 import {buildPrecheckReport,safeReportFilename} from './reports';
 import PublicSite from './PublicSite';
 import DecisionIntelligence from './DecisionIntelligence';
+import BusinessLocation from './BusinessLocation';
 import OperationPulse,{type OperationFlow} from './OperationPulse';
 import {addParticipant,addRow,advance,configured,db,loadWorkspace,provisionOrganization,sendMagicLink,taskDone,uploadDocument,type Workspace} from './backend';
 import './styles.css';
 
-type Tab='command'|'decision'|'intelligence'|'match'|'properties'|'deals'|'verify'|'track'|'network'|'finance'|'evidence';
+type Tab='command'|'business'|'decision'|'intelligence'|'match'|'properties'|'deals'|'verify'|'track'|'network'|'finance'|'evidence';
 type FormKind='property'|'demand'|'deal'|'task'|'contact'|'exchange'|'fee'|'participant'|null;
 type Notice={kind:'ok'|'error';message:string};
 const MENU:{key:Tab;label:string;icon:LucideIcon;group:string}[]=[
@@ -23,6 +24,7 @@ const MENU:{key:Tab;label:string;icon:LucideIcon;group:string}[]=[
  {key:'network',label:'Colaboraciones',icon:Network,group:'COMERCIAL'},
  {key:'intelligence',label:'Intelligence',icon:Compass,group:'INTELIGENCIA'},
  {key:'decision',label:'Decision Intelligence',icon:BarChart3,group:'INTELIGENCIA'},
+ {key:'business',label:'Ubicación para negocios',icon:MapPin,group:'INTELIGENCIA'},
  {key:'evidence',label:'Fuentes y evidencia',icon:BookOpen,group:'INTELIGENCIA'},
  {key:'finance',label:'Comisiones',icon:Wallet,group:'GESTIÓN'}
 ];
@@ -251,6 +253,8 @@ export default function App(){
     </>}
 
     {tab==='decision'&&!isParticipant&&<DecisionIntelligence properties={workspace.properties}/>}
+
+    {tab==='business'&&!isParticipant&&<BusinessLocation/>}
 
     {tab==='intelligence'&&!isParticipant&&<>
      <SectionTitle eyebrow="INTELIGENCIA PARA DECIDIR" title="¿Esta ubicación me conviene?" subtitle="Compara alternativas con las características que conocemos. Los datos no disponibles se declaran, nunca se inventan."/>
